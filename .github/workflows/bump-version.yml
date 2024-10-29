@@ -1,0 +1,25 @@
+name: bump-version
+
+on:
+  push:
+    branches:
+      - staging
+jobs:
+  bump-version:
+    name: "Bump version"
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Git
+        run: |
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+
+      - name: Install Versionize and bump version
+        run: |
+          dotnet tool install --global Versionize
+          versionize --ignore-insignificant-commits
+          git push --follow-tags origin staging
