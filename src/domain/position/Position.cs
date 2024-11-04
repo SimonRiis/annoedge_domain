@@ -32,9 +32,9 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     // Add a leg to the position
     public Fin<Unit> AddLeg(PositionLeg leg)
     {
-        var existingLeg = _legs.FirstOrDefault(l => l.Symbol == leg.Symbol && l.Exchange == leg.Exchange);
+        var existingLeg = _legs.FirstOrDefault(l => l.Product.Id == leg.Product.Id && l.Exchange == leg.Exchange);
         if (existingLeg != null)
-            return Error.New($"Position leg already exists for {leg.Symbol} and {leg.Exchange} please increase leg instead");
+            return Error.New($"Position leg already exists for {leg.Product.Symbol} and {leg.Exchange} please increase leg instead");
         _legs.Add(leg);
         return FinSucc(unit);
     }

@@ -12,7 +12,7 @@ public enum OrderStatus
     Canceled
 }
 
-public class Order(Product product, Exchange exchange, Guid id, decimal quantity, decimal price)
+public class Order(Product product, Exchange exchange, Guid id, decimal quantity, decimal price, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
 {
     public Guid Id { get; init; } = id;
     public Product Product { get; init; } = product;
@@ -20,6 +20,8 @@ public class Order(Product product, Exchange exchange, Guid id, decimal quantity
     public decimal Price { get; init; } = price;
     public Exchange Exchange { get; init; } = exchange;
     public OrderStatus Status { get; private set; } = OrderStatus.Pending;
+    public DateTimeOffset LastUpdated { get; private set; } = lastUpdated;
+    public DateTimeOffset ExchangeTimestamp { get; init; } = exchangeTimestamp;
 
     private readonly List<Trade> _trades = new List<Trade>();
     private readonly List<Fill> _fills = new List<Fill>();

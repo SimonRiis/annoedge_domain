@@ -1,4 +1,4 @@
-namespace domain.order;
+namespace domain.shared;
 
 public record ProductInfo
 {

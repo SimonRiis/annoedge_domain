@@ -7,4 +7,5 @@ public record Trade
     public required decimal Quantity { get; init; }
     public required decimal Price { get; init; }
     public required decimal TotalPriceInUSD { get; init; }
+    public required DateTimeOffset ExchangeTimestamp { get; init; }
 }
