@@ -3,9 +3,10 @@ using LanguageExt.Common;
 using static LanguageExt.Prelude;
 namespace domain.position;
 
-public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated, IPositionLegService positionLegService) : IEquatable<Position>
+public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated, PositionMandate positionMandate, IPositionLegService positionLegService) : IEquatable<Position>
 {
     public Guid Id { get; init; } = id;
+    public PositionMandate PositionMandate { get; private set; } = positionMandate;
     public PositionStatus Status { get; private set; } = status;
     public DateTimeOffset LastUpdated { get; private set; } = lastUpdated;
     private readonly List<PositionLeg> _legs = [];
@@ -27,6 +28,23 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     public override int GetHashCode()
     {
         return HashCode.Combine(Id);
+    }
+
+    public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal takeprofitpct)
+    {
+        if (stoplosspct >= 0)
+            return Error.New("Stoploss must be a negative decimal less than 0");
+
+        if (takeprofitpct <= 0)
+            return Error.New("Take profit must be a non negative decimal bigger than 0");
+
+        PositionMandate = PositionMandate with
+        {
+            StoplossPct = stoplosspct,
+            TakeProfitPct = takeprofitpct
+        };
+
+        return FinSucc(unit);
     }
 
     // Add a leg to the position
