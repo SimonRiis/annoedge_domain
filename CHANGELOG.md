@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.4.0"></a>
+## [0.4.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.4.0) (2024-11-04)
+
+### Features
+
+* Added timestamp to all aggregates and entities, made positionleg depend on product instead of symbol ([f0b3dd9](https://www.github.com/SimonRiis/annoedge_domain/commit/f0b3dd9e9dc5faeb64fbf44fc20bd2b4a849c77f))
+
 <a name="0.3.0"></a>
 ## [0.3.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.3.0) (2024-11-02)
 
