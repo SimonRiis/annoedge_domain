@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.5.0"></a>
+## [0.5.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.5.0) (2024-11-05)
+
+### Features
+
+* Added mandate to position ([f9b0a38](https://www.github.com/SimonRiis/annoedge_domain/commit/f9b0a382611ba97095645e98fdc17a963fd4207e))
+
 <a name="0.4.0"></a>
 ## [0.4.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.4.0) (2024-11-04)
 
