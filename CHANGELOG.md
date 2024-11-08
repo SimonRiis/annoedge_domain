@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.6.0"></a>
+## [0.6.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.6.0) (2024-11-08)
+
+### Features
+
+* Use Product on bookEntry instead of Symbol directly ([248ca5b](https://www.github.com/SimonRiis/annoedge_domain/commit/248ca5bec2e512b37091cd729ef074cb29fc3588))
+
 <a name="0.5.0"></a>
 ## [0.5.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.5.0) (2024-11-05)
 
