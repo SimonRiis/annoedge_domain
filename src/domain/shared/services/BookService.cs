@@ -13,7 +13,7 @@ public class BookService : IBookService
     private Dictionary<Guid, decimal> AggregateExposure(IEnumerable<BookEntry> entries)
     {
         return entries
-            .GroupBy(entry => entry.Symbol.Id)
+            .GroupBy(entry => entry.Product.Symbol.Id)
             .Select(group => new
             {
                 SymbolId = group.Key,
