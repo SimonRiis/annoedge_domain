@@ -30,12 +30,19 @@ namespace test
             var exchangeId = Guid.NewGuid();
             var symbolId = Guid.NewGuid();
 
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+            };
+
             var bookEntry = new BookEntry
             {
                 Id = Guid.NewGuid(),
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
-                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+                Product = product,
                 Volume = 100m
             };
 
@@ -80,12 +87,20 @@ namespace test
             var exchangeId = Guid.NewGuid();
             var symbolId = Guid.NewGuid();
 
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+            };
+
+
             var bookEntry = new BookEntry
             {
                 Id = Guid.NewGuid(),
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
-                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+                Product = product,
                 Volume = 100m
             };
 
@@ -94,7 +109,7 @@ namespace test
                 Id = Guid.NewGuid(),
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
-                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+                Product = product,
                 Volume = 50m
             };
 
@@ -143,14 +158,19 @@ namespace test
             // Arrange
             var symbolId = Guid.NewGuid();
             var exchangeId = Guid.NewGuid();
-           
+        var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+            };
 
             var bookEntry = new BookEntry
             {
                 Id = Guid.NewGuid(),
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
-                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+                Product = product,
                 Volume = 100m
             };
 
@@ -192,14 +212,19 @@ namespace test
             // Arrange
             var symbolId = Guid.NewGuid();
             var exchangeId = Guid.NewGuid();
-           
+        var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+            };
 
             var bookEntry = new BookEntry
             {
                 Id = Guid.NewGuid(),
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
-                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+                   Product = product,
                 Volume = 100m
             };
 
@@ -207,15 +232,15 @@ namespace test
 
             book1.AddBookEntry(bookEntry);
 
-    var bookEntry2 = new BookEntry
+            var bookEntry2 = new BookEntry
             {
                 Id = Guid.NewGuid(),
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
-                Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
+                 Product = product,
                 Volume = 50m
             };
-            
+
             var book2 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 1 };
             book2.AddBookEntry(bookEntry2);
 
@@ -246,7 +271,7 @@ namespace test
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual($"IMBALANCE for symbol id: {symbolId}", result.Match(Fail: err => err.Message, Succ:_ => ""));
+            Assert.AreEqual($"IMBALANCE for symbol id: {symbolId}", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
     }
 }
