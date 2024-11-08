@@ -3,25 +3,25 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 namespace domain.position;
 
-public class PositionLegService(IPriceService priceService, IVolumeService volumeService) : IPositionLegService
+public class PositionLegService(IPriceService priceService, IQuantityService QuantityService) : IPositionLegService
 {
-    public Fin<PositionLeg> DecreaseVolume(PositionLeg leg, decimal volumeReduction)
+    public Fin<PositionLeg> DecreaseQuantity(PositionLeg leg, decimal QuantityReduction)
     {
         // Keep the same AverageEntryPrice (since exiting doesn’t affect the entry price of the remaining position)
-        return volumeService.DecreaseVolume(leg.Volume, volumeReduction).Bind(newVolume =>
+        return QuantityService.DecreaseQuantity(leg.Quantity, QuantityReduction).Bind(newQuantity =>
         {
-            var newLeg = leg with { Volume = newVolume, LastUpdated = DateTimeOffset.UtcNow };
+            var newLeg = leg with { Quantity = newQuantity, LastUpdated = DateTimeOffset.UtcNow };
             return FinSucc(newLeg);
         });
     }
 
-    public Fin<PositionLeg> IncreaseVolume(PositionLeg leg, decimal additionalVolume, decimal newEntryPrice)
+    public Fin<PositionLeg> IncreaseQuantity(PositionLeg leg, decimal additionalQuantity, decimal newEntryPrice)
     {
-        return priceService.GetNewAverageEntryPrice(leg.Volume, additionalVolume, leg.AverageEntryPrice, newEntryPrice).Bind(price =>
+        return priceService.GetNewAverageEntryPrice(leg.Quantity, additionalQuantity, leg.AverageEntryPrice, newEntryPrice).Bind(price =>
         {
-            return volumeService.IncreaseVolume(leg.Volume, additionalVolume).Bind(newVolume =>
+            return QuantityService.IncreaseQuantity(leg.Quantity, additionalQuantity).Bind(newQuantity =>
             {
-                var newLeg = leg with { Volume = newVolume, AverageEntryPrice = price, LastUpdated = DateTimeOffset.UtcNow };
+                var newLeg = leg with { Quantity = newQuantity, AverageEntryPrice = price, LastUpdated = DateTimeOffset.UtcNow };
                 return FinSucc(newLeg);
             });
         });

@@ -24,7 +24,7 @@ namespace test
         }
 
         [TestMethod]
-        public void VerifyBooksForExchange_WithMatchingVolumes_ReturnsSuccess()
+        public void VerifyBooksForExchange_WithMatchingQuantitys_ReturnsSuccess()
         {
             // Arrange
             var exchangeId = Guid.NewGuid();
@@ -43,10 +43,10 @@ namespace test
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
                 Product = product,
-                Volume = 100m
+                Quantity = 100m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
 
             book1.AddBookEntry(bookEntry);
 
@@ -101,7 +101,7 @@ namespace test
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
                 Product = product,
-                Volume = 100m
+                Quantity = 100m
             };
 
             var bookEntry2 = new BookEntry
@@ -110,15 +110,15 @@ namespace test
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
                 Product = product,
-                Volume = 50m
+                Quantity = 50m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
 
             book1.AddBookEntry(bookEntry);
 
 
-            var book2 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 1 };
+            var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 1 };
             book2.AddBookEntry(bookEntry2);
 
             var exchange = new Exchange { Name = "KRAKEN", Id = exchangeId };
@@ -153,7 +153,7 @@ namespace test
         }
 
         [TestMethod]
-        public void VerifyGlobalBook_WithMatchingVolumes_ReturnsSuccess()
+        public void VerifyGlobalBook_WithMatchingQuantitys_ReturnsSuccess()
         {
             // Arrange
             var symbolId = Guid.NewGuid();
@@ -171,10 +171,10 @@ namespace test
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
                 Product = product,
-                Volume = 100m
+                Quantity = 100m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
 
             book1.AddBookEntry(bookEntry);
 
@@ -225,10 +225,10 @@ namespace test
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
                    Product = product,
-                Volume = 100m
+                Quantity = 100m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
 
             book1.AddBookEntry(bookEntry);
 
@@ -238,10 +238,10 @@ namespace test
                 AverageEntryPrice = 1m,
                 LastUpdated = DateTimeOffset.UtcNow,
                  Product = product,
-                Volume = 50m
+                Quantity = 50m
             };
 
-            var book2 = new Book(new BookEntryService(new PriceService(), new VolumeService())) { Id = 1 };
+            var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 1 };
             book2.AddBookEntry(bookEntry2);
 
 

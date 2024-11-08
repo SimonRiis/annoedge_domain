@@ -5,6 +5,6 @@ namespace domain.book;
 
 public interface IBookEntryService
 {
-    Fin<BookEntry> IncreaseVolume(BookEntry bookEntry, decimal additionalVolume, decimal newEntryPrice);
-    Fin<BookEntry> DecreaseVolume(BookEntry bookEntry, decimal volumeReduction);  
+    Fin<BookEntry> IncreaseQuantity(BookEntry bookEntry, decimal additionalQuantity, decimal newEntryPrice);
+    Fin<BookEntry> DecreaseQuantity(BookEntry bookEntry, decimal QuantityReduction);  
 }

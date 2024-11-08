@@ -17,9 +17,9 @@ public class BookService : IBookService
             .Select(group => new
             {
                 SymbolId = group.Key,
-                AggregatedVolume = group.Sum(entry => entry.Volume)
+                AggregatedQuantity = group.Sum(entry => entry.Quantity)
             })
-            .ToDictionary(x => x.SymbolId, x => x.AggregatedVolume);
+            .ToDictionary(x => x.SymbolId, x => x.AggregatedQuantity);
     }
 
     public Fin<bool> VerifyBooksForExchange(Guid exchangeId, IEnumerable<ExchangeBook> exchangeBooks, IEnumerable<AlgoBook> algoBooks)

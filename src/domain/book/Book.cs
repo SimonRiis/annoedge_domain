@@ -37,21 +37,21 @@ public class Book(IBookEntryService bookEntryService)
            None: () => Error.New($"BookEntry for id {oldBookEntry.Id} not found.")
        );
     }
-    public Fin<Unit> IncreaseBookEntryVolume(Guid bookEntryId, decimal additionalVolume, decimal newEntryPrice)
+    public Fin<Unit> IncreaseBookEntryQuantity(Guid bookEntryId, decimal additionalQuantity, decimal newEntryPrice)
     {
         var bookEntry = GetBookEntryById(bookEntryId);
         return bookEntry.Match(
-            Some: b => bookEntryService.IncreaseVolume(b, additionalVolume, newEntryPrice)
+            Some: b => bookEntryService.IncreaseQuantity(b, additionalQuantity, newEntryPrice)
                 .Bind(updatedLeg => UpdateBookEntry(b, updatedLeg)),
             None: () => Error.New($"BookEntry for id {bookEntryId} not found.")
         );
     }
 
-    public Fin<Unit> DecreaseBookEntryVolume(Guid bookEntryId, decimal decreaseVolume)
+    public Fin<Unit> DecreaseBookEntryQuantity(Guid bookEntryId, decimal decreaseQuantity)
     {
         var bookEntry = GetBookEntryById(bookEntryId);
         return bookEntry.Match(
-            Some: b => bookEntryService.DecreaseVolume(b, decreaseVolume)
+            Some: b => bookEntryService.DecreaseQuantity(b, decreaseQuantity)
                 .Bind(updatedLeg => UpdateBookEntry(b, updatedLeg)),
             None: () => Error.New($"BookEntry for id {bookEntryId} not found.")
         );

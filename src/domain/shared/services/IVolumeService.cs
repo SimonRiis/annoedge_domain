@@ -2,8 +2,8 @@ using LanguageExt;
 
 namespace domain.shared.services;
 
-public interface IVolumeService
+public interface IQuantityService
 {
-    public Fin<decimal> IncreaseVolume(decimal currentVolume, decimal additionalVolume);
-    public Fin<decimal> DecreaseVolume(decimal currentVolume, decimal volumeReduction);
+    public Fin<decimal> IncreaseQuantity(decimal currentQuantity, decimal additionalQuantity);
+    public Fin<decimal> DecreaseQuantity(decimal currentQuantity, decimal QuantityReduction);
 }
