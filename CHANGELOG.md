@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.7.0"></a>
+## [0.7.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.7.0) (2024-11-08)
+
+### Features
+
+* Align naming: Use  Quantity ([6830f5b](https://www.github.com/SimonRiis/annoedge_domain/commit/6830f5bf4e20be98f9cbf9ff71180a98bd1b5d07))
+
 <a name="0.6.0"></a>
 ## [0.6.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.6.0) (2024-11-08)
 

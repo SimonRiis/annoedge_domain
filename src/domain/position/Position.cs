@@ -67,21 +67,21 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         return FinSucc(unit);
     }
 
-    public Fin<Unit> IncreaseLeg(Guid legId, decimal additionalVolume, decimal newEntryPrice)
+    public Fin<Unit> IncreaseLeg(Guid legId, decimal additionalQuantity, decimal newEntryPrice)
     {
         var leg = GetLegById(legId);
         return leg.Match(
-            Some: l => positionLegService.IncreaseVolume(l, additionalVolume, newEntryPrice)
+            Some: l => positionLegService.IncreaseQuantity(l, additionalQuantity, newEntryPrice)
                 .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
             None: () => Error.New($"Position leg {legId} not found.")
         );
     }
 
-    public Fin<Unit> DecreaseLeg(Guid legId, decimal decreaseVolume)
+    public Fin<Unit> DecreaseLeg(Guid legId, decimal decreaseQuantity)
     {
         var leg = GetLegById(legId);
         return leg.Match(
-            Some: l => positionLegService.DecreaseVolume(l, decreaseVolume)
+            Some: l => positionLegService.DecreaseQuantity(l, decreaseQuantity)
                 .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
             None: () => Error.New($"Position leg {legId} not found.")
         );

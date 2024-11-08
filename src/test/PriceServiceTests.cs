@@ -22,13 +22,13 @@ namespace tests
         public void GetNewAverageEntryPrice_WithValidInput_ReturnsCorrectAverage()
         {
             // Arrange
-            decimal oldVolume = 100m;
-            decimal additionalVolume = 50m;
+            decimal oldQuantity = 100m;
+            decimal additionalQuantity = 50m;
             decimal oldAverageEntryPrice = 10m;
             decimal newEntryPrice = 15m;
 
             // Act
-            var result = _priceService.GetNewAverageEntryPrice(oldVolume, additionalVolume, oldAverageEntryPrice, newEntryPrice);
+            var result = _priceService.GetNewAverageEntryPrice(oldQuantity, additionalQuantity, oldAverageEntryPrice, newEntryPrice);
 
             // Assert
             Assert.IsTrue(result.IsSucc);
@@ -36,33 +36,33 @@ namespace tests
         }
 
         [TestMethod]
-        public void GetNewAverageEntryPrice_WithZeroAdditionalVolume_ReturnsError()
+        public void GetNewAverageEntryPrice_WithZeroAdditionalQuantity_ReturnsError()
         {
             // Arrange
-            decimal oldVolume = 100m;
-            decimal additionalVolume = 0m; // Invalid additional volume
+            decimal oldQuantity = 100m;
+            decimal additionalQuantity = 0m; // Invalid additional Quantity
             decimal oldAverageEntryPrice = 10m;
             decimal newEntryPrice = 15m;
 
             // Act
-            var result = _priceService.GetNewAverageEntryPrice(oldVolume, additionalVolume, oldAverageEntryPrice, newEntryPrice);
+            var result = _priceService.GetNewAverageEntryPrice(oldQuantity, additionalQuantity, oldAverageEntryPrice, newEntryPrice);
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Additional volume cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Additional Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]
         public void GetNewAverageEntryPrice_WithZeroNewEntryPrice_ReturnsError()
         {
             // Arrange
-            decimal oldVolume = 100m;
-            decimal additionalVolume = 50m;
+            decimal oldQuantity = 100m;
+            decimal additionalQuantity = 50m;
             decimal oldAverageEntryPrice = 10m;
             decimal newEntryPrice = 0m; // Invalid new entry price
 
             // Act
-            var result = _priceService.GetNewAverageEntryPrice(oldVolume, additionalVolume, oldAverageEntryPrice, newEntryPrice);
+            var result = _priceService.GetNewAverageEntryPrice(oldQuantity, additionalQuantity, oldAverageEntryPrice, newEntryPrice);
 
             // Assert
             Assert.IsTrue(result.IsFail);
@@ -70,33 +70,33 @@ namespace tests
         }
 
         [TestMethod]
-        public void GetNewAverageEntryPrice_WithNegativeAdditionalVolume_ReturnsError()
+        public void GetNewAverageEntryPrice_WithNegativeAdditionalQuantity_ReturnsError()
         {
             // Arrange
-            decimal oldVolume = 100m;
-            decimal additionalVolume = -50m; // Invalid negative additional volume
+            decimal oldQuantity = 100m;
+            decimal additionalQuantity = -50m; // Invalid negative additional Quantity
             decimal oldAverageEntryPrice = 10m;
             decimal newEntryPrice = 15m;
 
             // Act
-            var result = _priceService.GetNewAverageEntryPrice(oldVolume, additionalVolume, oldAverageEntryPrice, newEntryPrice);
+            var result = _priceService.GetNewAverageEntryPrice(oldQuantity, additionalQuantity, oldAverageEntryPrice, newEntryPrice);
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Additional volume cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Additional Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]
         public void GetNewAverageEntryPrice_WithNegativeNewEntryPrice_ReturnsError()
         {
             // Arrange
-            decimal oldVolume = 100m;
-            decimal additionalVolume = 50m;
+            decimal oldQuantity = 100m;
+            decimal additionalQuantity = 50m;
             decimal oldAverageEntryPrice = 10m;
             decimal newEntryPrice = -15m; // Invalid negative new entry price
 
             // Act
-            var result = _priceService.GetNewAverageEntryPrice(oldVolume, additionalVolume, oldAverageEntryPrice, newEntryPrice);
+            var result = _priceService.GetNewAverageEntryPrice(oldQuantity, additionalQuantity, oldAverageEntryPrice, newEntryPrice);
 
             // Assert
             Assert.IsTrue(result.IsFail);
@@ -104,16 +104,16 @@ namespace tests
         }
 
         [TestMethod]
-        public void GetNewAverageEntryPrice_WithZeroOldVolume_ReturnsCorrectAverage()
+        public void GetNewAverageEntryPrice_WithZeroOldQuantity_ReturnsCorrectAverage()
         {
             // Arrange
-            decimal oldVolume = 0m; // Zero old volume
-            decimal additionalVolume = 50m;
+            decimal oldQuantity = 0m; // Zero old Quantity
+            decimal additionalQuantity = 50m;
             decimal oldAverageEntryPrice = 10m; // Should not affect result
             decimal newEntryPrice = 15m;
 
             // Act
-            var result = _priceService.GetNewAverageEntryPrice(oldVolume, additionalVolume, oldAverageEntryPrice, newEntryPrice);
+            var result = _priceService.GetNewAverageEntryPrice(oldQuantity, additionalQuantity, oldAverageEntryPrice, newEntryPrice);
 
             // Assert
             Assert.IsTrue(result.IsSucc);

@@ -4,26 +4,26 @@ using static LanguageExt.Prelude;
 
 namespace domain.shared.services;
 
-public class VolumeService : IVolumeService
+public class QuantityService : IQuantityService
 {
-    public Fin<decimal> DecreaseVolume(decimal currentVolume, decimal volumeReduction)
+    public Fin<decimal> DecreaseQuantity(decimal currentQuantity, decimal QuantityReduction)
     {
-        if (volumeReduction <= 0)
-            return Error.New("Decrease volume cannot be zero.");
+        if (QuantityReduction <= 0)
+            return Error.New("Decrease Quantity cannot be zero.");
 
-        if (volumeReduction > currentVolume)
-            return Error.New("Decrease volume cannot exceed current position volume.");
+        if (QuantityReduction > currentQuantity)
+            return Error.New("Decrease Quantity cannot exceed current position Quantity.");
 
-        // Calculate the new volume after decreasing
-        var newVolume = currentVolume - volumeReduction;
-        return FinSucc(newVolume);
+        // Calculate the new Quantity after decreasing
+        var newQuantity = currentQuantity - QuantityReduction;
+        return FinSucc(newQuantity);
     }
 
-    public Fin<decimal> IncreaseVolume(decimal currentVolume, decimal additionalVolume)
+    public Fin<decimal> IncreaseQuantity(decimal currentQuantity, decimal additionalQuantity)
     {
-        if (additionalVolume <= 0)
-            return Error.New("Additional volume cannot be zero.");
-        var newVolume = currentVolume + additionalVolume;
-        return FinSucc(newVolume);
+        if (additionalQuantity <= 0)
+            return Error.New("Additional Quantity cannot be zero.");
+        var newQuantity = currentQuantity + additionalQuantity;
+        return FinSucc(newQuantity);
     }
 }

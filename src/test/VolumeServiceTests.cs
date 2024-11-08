@@ -8,27 +8,27 @@ using static LanguageExt.Prelude;
 namespace test
 {
     [TestClass]
-    public class VolumeServiceTests
+    public class QuantityServiceTests
     {
-        private VolumeService _volumeService;
+        private QuantityService _QuantityService;
 
         [TestInitialize]
         public void Setup()
         {
-            _volumeService = new VolumeService();
+            _QuantityService = new QuantityService();
         }
 
-        // Tests for DecreaseVolume method
+        // Tests for DecreaseQuantity method
 
         [TestMethod]
-        public void DecreaseVolume_WithValidInput_ReturnsNewVolume()
+        public void DecreaseQuantity_WithValidInput_ReturnsNewQuantity()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal volumeReduction = 30m;
+            decimal currentQuantity = 100m;
+            decimal QuantityReduction = 30m;
 
             // Act
-            var result = _volumeService.DecreaseVolume(currentVolume, volumeReduction);
+            var result = _QuantityService.DecreaseQuantity(currentQuantity, QuantityReduction);
 
             // Assert
             Assert.IsTrue(result.IsSucc);
@@ -36,61 +36,61 @@ namespace test
         }
 
         [TestMethod]
-        public void DecreaseVolume_WithZeroVolumeReduction_ReturnsError()
+        public void DecreaseQuantity_WithZeroQuantityReduction_ReturnsError()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal volumeReduction = 0m; // Invalid volume reduction
+            decimal currentQuantity = 100m;
+            decimal QuantityReduction = 0m; // Invalid Quantity reduction
 
             // Act
-            var result = _volumeService.DecreaseVolume(currentVolume, volumeReduction);
+            var result = _QuantityService.DecreaseQuantity(currentQuantity, QuantityReduction);
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Decrease volume cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Decrease Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]
-        public void DecreaseVolume_WithVolumeReductionExceedingCurrentVolume_ReturnsError()
+        public void DecreaseQuantity_WithQuantityReductionExceedingCurrentQuantity_ReturnsError()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal volumeReduction = 150m; // Exceeds current volume
+            decimal currentQuantity = 100m;
+            decimal QuantityReduction = 150m; // Exceeds current Quantity
 
             // Act
-            var result = _volumeService.DecreaseVolume(currentVolume, volumeReduction);
+            var result = _QuantityService.DecreaseQuantity(currentQuantity, QuantityReduction);
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Decrease volume cannot exceed current position volume.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Decrease Quantity cannot exceed current position Quantity.", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]
-        public void DecreaseVolume_WithExactVolumeReduction_ReturnsZero()
+        public void DecreaseQuantity_WithExactQuantityReduction_ReturnsZero()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal volumeReduction = 100m; // Matches current volume exactly
+            decimal currentQuantity = 100m;
+            decimal QuantityReduction = 100m; // Matches current Quantity exactly
 
             // Act
-            var result = _volumeService.DecreaseVolume(currentVolume, volumeReduction);
+            var result = _QuantityService.DecreaseQuantity(currentQuantity, QuantityReduction);
 
             // Assert
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(0m, result.IfFail(0m));
         }
 
-        // Tests for IncreaseVolume method
+        // Tests for IncreaseQuantity method
 
         [TestMethod]
-        public void IncreaseVolume_WithValidInput_ReturnsNewVolume()
+        public void IncreaseQuantity_WithValidInput_ReturnsNewQuantity()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal additionalVolume = 50m;
+            decimal currentQuantity = 100m;
+            decimal additionalQuantity = 50m;
 
             // Act
-            var result = _volumeService.IncreaseVolume(currentVolume, additionalVolume);
+            var result = _QuantityService.IncreaseQuantity(currentQuantity, additionalQuantity);
 
             // Assert
             Assert.IsTrue(result.IsSucc);
@@ -98,33 +98,33 @@ namespace test
         }
 
         [TestMethod]
-        public void IncreaseVolume_WithZeroAdditionalVolume_ReturnsError()
+        public void IncreaseQuantity_WithZeroAdditionalQuantity_ReturnsError()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal additionalVolume = 0m; // Invalid additional volume
+            decimal currentQuantity = 100m;
+            decimal additionalQuantity = 0m; // Invalid additional Quantity
 
             // Act
-            var result = _volumeService.IncreaseVolume(currentVolume, additionalVolume);
+            var result = _QuantityService.IncreaseQuantity(currentQuantity, additionalQuantity);
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Additional volume cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Additional Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]
-        public void IncreaseVolume_WithNegativeAdditionalVolume_ReturnsError()
+        public void IncreaseQuantity_WithNegativeAdditionalQuantity_ReturnsError()
         {
             // Arrange
-            decimal currentVolume = 100m;
-            decimal additionalVolume = -50m; // Invalid negative additional volume
+            decimal currentQuantity = 100m;
+            decimal additionalQuantity = -50m; // Invalid negative additional Quantity
 
             // Act
-            var result = _volumeService.IncreaseVolume(currentVolume, additionalVolume);
+            var result = _QuantityService.IncreaseQuantity(currentQuantity, additionalQuantity);
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Additional volume cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Additional Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
     }
 }
