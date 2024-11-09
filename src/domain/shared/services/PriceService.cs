@@ -8,7 +8,7 @@ public class PriceService : IPriceService
     public Fin<decimal> GetNewAverageEntryPrice(decimal oldQuantity, decimal additionalQuantity, decimal oldAverageEntryPrice, decimal newEntryPrice)
     {
         if (additionalQuantity <= 0)
-            return Error.New("Additional Quantity cannot be zero.");
+            return Error.New("Invalid quantity");
 
         if (newEntryPrice <= 0)
             return Error.New("New EntryPrice cannot be zero.");

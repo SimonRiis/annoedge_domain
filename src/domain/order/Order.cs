@@ -1,20 +1,16 @@
 using domain.shared;
+using domain.shared.enums;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
 namespace domain.order;
 
-public enum OrderStatus
-{
-    Pending,
-    PartiallyFilled,
-    Filled,
-    Canceled
-}
 
-public class Order(Product product, Exchange exchange, Guid id, decimal quantity, decimal price, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
+
+public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal quantity, decimal price, Direction direction, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
 {
-    public Guid Id { get; init; } = id;
+    public Direction Direction { get; init; } = direction;
+    public ExchangeMapId Id { get; init; } = id;
     public Product Product { get; init; } = product;
     public decimal Quantity { get; init; } = quantity;
     public decimal Price { get; init; } = price;
@@ -31,7 +27,7 @@ public class Order(Product product, Exchange exchange, Guid id, decimal quantity
 
     public Fin<Unit> AddTrade(Trade trade)
     {
-        if (trade.OrderId != Id)
+        if (trade.OrderId.InternalId != Id.InternalId)
             return Error.New($"Trade with tradeId: {trade.Id} does not belong to this order.");
 
         _trades.Add(trade);
@@ -41,7 +37,7 @@ public class Order(Product product, Exchange exchange, Guid id, decimal quantity
 
     public Fin<Unit> AddFill(Fill fill)
     {
-        if (fill.OrderId != Id)
+        if (fill.OrderId.InternalId != Id.InternalId)
             return Error.New($"Fill with fillId: {fill.Id} does not belong to this order.");
 
         _fills.Add(fill);

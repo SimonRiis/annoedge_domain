@@ -12,6 +12,9 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     private readonly List<PositionLeg> _legs = [];
     public IReadOnlyCollection<PositionLeg> Legs => _legs.AsReadOnly();
 
+    private readonly List<PositionOrderMap> _positionOrderMaps = [];
+    public IReadOnlyCollection<PositionOrderMap> PositionOrderMaps => _positionOrderMaps.AsReadOnly();
+
     public bool Equals(Position? other)
     {
         if (other is null) return false;
@@ -28,6 +31,15 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     public override int GetHashCode()
     {
         return HashCode.Combine(Id);
+    }
+
+    public Fin<Unit> AddPositionOrderMap(PositionOrderMap positionOrderMap)
+    {
+        if (_positionOrderMaps.Any(pom => pom.OrderId == positionOrderMap.OrderId))
+            return Error.New("PositionOrderMap already exists for this order");
+
+        _positionOrderMaps.Add(positionOrderMap);
+        return FinSucc(unit);
     }
 
     public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal takeprofitpct)
