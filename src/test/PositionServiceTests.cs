@@ -77,7 +77,7 @@ namespace test
         [TestMethod]
         public void UpdatePosition_WithEmptyOrders_ReturnsSuccessWithNoChanges()
         {
-            var result = _positionService.UpdatePosition(_samplePosition, Enumerable.Empty<Order>());
+            var result = _positionService.UpdatePositionLegs(_samplePosition, Enumerable.Empty<Order>());
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(0, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
         }
@@ -87,7 +87,7 @@ namespace test
         {
             var order = CreateSampleOrder(Direction.LONG, Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order });
 
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(1, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
@@ -103,7 +103,7 @@ namespace test
             var order1 = CreateSampleOrder(Direction.LONG, orderId, productId, exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 5, 100, orderId) });
             var order2 = CreateSampleOrder(Direction.LONG, orderId, productId, exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 5, 100, orderId) });
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order1, order2 });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order1, order2 });
 
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(1, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
@@ -119,7 +119,7 @@ namespace test
             var order1 = CreateSampleOrder(Direction.LONG, orderId1, Guid.NewGuid(), exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 5, 100, orderId1) });
             var order2 = CreateSampleOrder(Direction.LONG, orderId2, Guid.NewGuid(), exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 5, 100, orderId2) });
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order1, order2 });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order1, order2 });
 
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(2, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
@@ -136,7 +136,7 @@ namespace test
             };
             var order = CreateSampleOrder(Direction.LONG, orderId, Guid.NewGuid(), Guid.NewGuid(), fills);
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order });
 
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(1, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
@@ -151,7 +151,7 @@ namespace test
             var exchangeId = Guid.NewGuid();
             var order1 = CreateSampleOrder(Direction.LONG, orderId, productId, exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 10, 100, orderId) });
             var order2 = CreateSampleOrder(Direction.SHORT, orderId, productId, exchangeId, new List<Fill> { CreateSampleFill(Direction.SHORT, 5, 100, orderId) });
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order1, order2 });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order1, order2 });
 
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(1, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
@@ -165,7 +165,7 @@ namespace test
             var invalidFill = CreateSampleFill((Direction)999, 5, 100, orderId1);
             var order = CreateSampleOrder(Direction.LONG, orderId1, Guid.NewGuid(), Guid.NewGuid(), new List<Fill> { invalidFill });
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order });
 
             Assert.IsTrue(result.IsFail);
             Assert.AreEqual("Invalid direction", result.Match(Fail: err => err.Message, Succ: _ => ""));
@@ -180,7 +180,7 @@ namespace test
             var order1 = CreateSampleOrder(Direction.LONG, orderId1, Guid.NewGuid(), exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 5, 100, orderId1) });
             var order2 = CreateSampleOrder(Direction.LONG, orderId2, Guid.NewGuid(), exchangeId, new List<Fill> { CreateSampleFill(Direction.LONG, 10, 100, orderId2) });
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order1, order2 });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order1, order2 });
 
             Assert.IsTrue(result.IsSucc);
             Assert.AreEqual(2, result.Match(Succ: pos => pos.Legs.Count, Fail: _ => -1));
@@ -195,7 +195,7 @@ namespace test
             var order1 = CreateSampleOrder(Direction.LONG, orderId1, Guid.NewGuid(), exchangeId,  new List<Fill> { CreateSampleFill(Direction.LONG, -5, 100, orderId1) });
             var order2 = CreateSampleOrder(Direction.SHORT, orderId2, Guid.NewGuid(), exchangeId, new List<Fill> { CreateSampleFill(Direction.SHORT, -5, 100, orderId2) });
 
-            var result = _positionService.UpdatePosition(_samplePosition, new List<Order> { order1, order2 });
+            var result = _positionService.UpdatePositionLegs(_samplePosition, new List<Order> { order1, order2 });
 
             Assert.IsTrue(result.IsFail);
             Assert.IsTrue(result.Match(Fail: err => err.Message, Succ: _ => "").Contains("Invalid quantity"));
