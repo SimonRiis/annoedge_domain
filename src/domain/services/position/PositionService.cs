@@ -10,7 +10,7 @@ using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionService(IPositionLegService positionLegService) : IPositionService
+    public class PositionService(IPositionLegService positionLegService, IPositionLegRepository positionLegRepository, IPositionRepository positionRepository) : IPositionService
     {
         public Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate)
         {
@@ -52,6 +52,34 @@ namespace domain.services.position
 
             return FinSucc(new Position(positionId, PositionStatus.PENDING, DateTimeOffset.UtcNow, positionMandate, positionLegService));
 
+        }
+
+
+        private async Task<Fin<Position>> ProcessPosition(Position position)
+        {
+            var positionLegs = await positionLegRepository.QueryAsync($"select * from position_leg where position_id ={position.Id}");
+            return positionLegs.Match(
+                Succ: legs =>
+                {
+                    legs.Iter(leg =>
+                    {
+                        position.AddLeg(leg);
+                    });
+                    return FinSucc(position);
+                },
+                Fail: error => FinFail<Position>(error)
+            );
+        }
+
+        public async Task<Fin<IEnumerable<Fin<Position>>>> GetPositions(string query)
+        {
+            var positionsResult = await positionRepository.QueryAsync(query);
+
+            return await Task.WhenAll(positionsResult.Bind(positions =>
+            {
+                return positions.Select(ProcessPosition);
+            }
+            ));
         }
 
         public Fin<Position> UpdatePositionLegs(Position position, IEnumerable<Order> orders)
@@ -141,6 +169,11 @@ namespace domain.services.position
             }
 
             return FinSucc(aggregatedPosition);
+        }
+
+        public Task<Fin<Unit>> UpdateAsync(Position position)
+        {
+            throw new NotImplementedException();
         }
     }
 }
