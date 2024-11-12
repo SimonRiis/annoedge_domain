@@ -4,9 +4,9 @@ using LanguageExt.Common;
 using static LanguageExt.Prelude;
 namespace domain.services.order
 {
-    public class OrderService : IOrderService
+    public class OrderMap : IOrderMap
     {
-        public Fin<Order> CreateFrom(OrderDTO order)
+        public Fin<Order> MapFrom(OrderDTO order)
         {
             var orderAggregate = new Order(order.Product, order.Exchange, order.Id, order.Quantity, order.Price, order.Direction, order.ExchangeTimestamp, order.LastUpdated);
 
@@ -40,7 +40,8 @@ namespace domain.services.order
                     OrderId = fill.OrderId,
                     Price = fill.Price,
                     Quantity = fill.Quantity,
-                    Direction = fill.Direction
+                    Direction = fill.Direction,
+                    Status = FillStatus.Pending
                 };
                 return orderAggregate.AddFill(fillEntity);
             });

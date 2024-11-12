@@ -1,14 +1,10 @@
 ﻿using domain.order;
-using domain.position;
-using domain.shared;
 using domain.shared.enums;
-using domain.shared.services;
 using LanguageExt;
 using LanguageExt.Common;
-using System.Reflection.Metadata.Ecma335;
 using static LanguageExt.Prelude;
 
-namespace domain.services.position
+namespace domain.position
 {
     public class PositionService(IPositionLegService positionLegService, IPositionLegRepository positionLegRepository, IPositionRepository positionRepository) : IPositionService
     {
@@ -155,7 +151,7 @@ namespace domain.services.position
 
                                 return res.All(r => r.IsSucc)
                                     ? FinSucc(unit)
-                                    : Error.New(String.Join(", ", res.Where(r => r.IsFail).Select(f => f.Match(Fail: err => err.Message, Succ: _ => ""))));
+                                    : Error.New(string.Join(", ", res.Where(r => r.IsFail).Select(f => f.Match(Fail: err => err.Message, Succ: _ => ""))));
                             },
                             None: () => Error.New("Leg not found")
                         );
@@ -172,6 +168,11 @@ namespace domain.services.position
         }
 
         public Task<Fin<Unit>> UpdateAsync(Position position)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<Fin<Position>> GetPositionForOrderIdAsync(Guid orderId)
         {
             throw new NotImplementedException();
         }

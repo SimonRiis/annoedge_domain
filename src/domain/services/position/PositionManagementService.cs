@@ -1,58 +1,107 @@
 ﻿using domain.order;
 using domain.position;
+using domain.shared;
+using domain.shared.enums;
+using domain.shared.repositories;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionManagementService(IPositionService positionService, IPositionOrderMapRepository positionOrderMapRepository, IOrderRepository orderRepository)
+    public class PositionManagementService(IOrderService orderService, IPositionService positionService, IUnitOfWork unitOfWork) : IPositionManagementService
     {
-        private async Task<Fin<Unit>> ProcessPosition(Position position)
-        {
-            var positionOrderMapRes = await positionOrderMapRepository.QueryAsync($"select * from position_order_map where position_id = '{position.Id}'");
-            return await positionOrderMapRes.Match(
-                Succ: async positionOrderMaps => await ProcessPositionOrderMaps(position, positionOrderMaps),
-                Fail: error => Task.FromResult(FinFail<Unit>(error))
-            );
-        }
 
-        private async Task<Fin<Unit>> ProcessPositionOrderMaps(Position position, IEnumerable<PositionOrderMap> positionOrderMaps)
-        {
-            var orders = positionOrderMaps.Map(pom => pom.OrderId).ToList();
-            var ordersRes = await orderRepository.QueryAsync($"select * from order where id in ({string.Join(",", orders)})");
-            return await ordersRes.Match(
-                Succ: async orders => await UpdatePositionWithOrders(position, orders),
-                Fail: error => Task.FromResult(FinFail<Unit>(error))
-            );
-        }
+        private async Task<Fin<Unit>> ProcessPosition(Position position, Order order) {
 
-        private async Task<Fin<Unit>> UpdatePositionWithOrders(Position position, IEnumerable<Order> orders)
-        {
-            var sortedOrders = orders.OrderBy(order => order.ExchangeTimestamp).ToList();
-            var positionRes = positionService.UpdatePositionLegs(position, sortedOrders);
-            return await positionRes.Match(
-                Succ: positionService.UpdateAsync,
-                Fail: error => Task.FromResult(FinFail<Unit>(error))
-            );
-        }
+            var fillsForPosition = order.Fills.OrderBy(x => x.ExchangeTimestamp);
+            var exchange = order.Exchange;
+            var product = order.Product;
+            var leg = position.Legs.FirstOrDefault(l => l.Product.Id == product.Id && l.Exchange.Id == exchange.Id);
 
-        public async Task<Fin<Unit>> ImportPositions()
-        {
-            var openPositionsRes = await positionService.GetPositions("select * from position where status != 'CLOSED'");
+            if (leg == null)
+            {
+                return Error.New($"Could not find leg: productId: {product.Id} and Exchange: {exchange.Id}");
+            }
 
-            return await openPositionsRes.Match(
-                Succ: async positions =>
+            fillsForPosition.Iter(fill =>
+            {
+                if (fill.Direction == Direction.LONG)
                 {
-                    var tasks = positions.Select(position => position.Bind(position => ProcessPosition(position)));
+                    position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price);
+                    order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied); //Fill is now fully applied
+                }
+                else if (fill.Direction == Direction.SHORT)
+                {
+                    position.DecreaseLeg(leg.Id, fill.Quantity);
+                    order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied); //Fill is now fully applied
+                }
+            });
+
+
+            await unitOfWork.Begin();
+            var positionRes = positionService.UpdateAsync(position);
+            var orderRes = orderService.UpdateAsync(order);
+            var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes };
+            var res = await Task.WhenAll(taskList);
+
+            if(res.All(result => result.IsSucc))
+            {
+                await unitOfWork.Commit();
+                return FinSucc(Unit.Default);
+            }
+            else
+            {
+                await unitOfWork.Rollback();
+                return FinFail<Unit>(string.Join(", ", res.Fails().Select(r => r.Message)));
+            }
+
+        }
+
+        private async Task<Fin<Unit>> ProcessOrder(Order order)
+        {
+            var position = await positionService.GetPositionForOrderIdAsync(order.Id.InternalId);
+            return await position.Match(
+                Succ: async position => await ProcessPosition(position, order),
+                Fail: error => Task.FromResult(FinFail<Unit>(error))
+            );
+        }
+
+        public async Task<Fin<Unit>> UpdatePositions()
+        {
+            // Get all orders with unhandled fills
+            var orders = await orderService.GetOrdersWithUnhandledFills();
+
+            // Get all positions for the orders
+
+            //    var orderIds = orders.OrderBy(x => x.ExchangeTimestamp).Select(o => o.Id.InternalId).ToList();
+
+            //Get grouped positions for the orders
+            //Note that a position can be for multiple orders, but one order can only have one position
+            //That will change when intent based volume mapping is added
+            //But that means that we now can loop over the orders, and apply all the fills for that order to the position
+
+            // Process each order asynchronously
+            return await orders.Match(
+                async orders =>
+                {
+                    var tasks = orders.Select(async order =>
+                        await order.Match(
+                            async o => await ProcessOrder(o),
+                            error => Task.FromResult(FinFail<Unit>(error))
+                        )
+                    );
+
                     var results = await Task.WhenAll(tasks);
+
                     return results.All(result => result.IsSucc)
                         ? FinSucc(Unit.Default)
                         : FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
                 },
-                Fail: error => Task.FromResult(FinFail<Unit>(error))
+                error => Task.FromResult(FinFail<Unit>(error))
             );
-        }
 
+        }
     }
 }
+

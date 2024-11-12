@@ -1,3 +1,4 @@
+using domain.position;
 using domain.shared;
 using domain.shared.enums;
 using LanguageExt;
@@ -43,6 +44,31 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
         _fills.Add(fill);
         UpdateOrderStatus();
         return FinSucc(unit);
+    }
+
+    public Option<Fill> GetFillById(Guid fillId) => _fills.Find(f => f.Id.InternalId == fillId);
+
+    private Fin<Unit> UpdateFill(Fill oldFill, Fill updatedFill)
+    {
+        if (oldFill == null)
+            return Error.New("Fill not found");
+
+        _fills[_fills.IndexOf(oldFill)] = updatedFill;
+        return FinSucc(unit);
+    }
+
+    public Fin<Unit> UpdateFillStatus(Guid fillId, FillStatus status)
+    {
+        var fill = GetFillById(fillId);
+        return fill.Match(
+            Some: f => {
+
+                var updatedFill = f with { Status = status };
+                return UpdateFill(f, updatedFill);
+
+            },
+            None: () => Error.New($"Fill {fillId} not found.")
+        );
     }
 
     private void UpdateOrderStatus()

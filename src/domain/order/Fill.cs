@@ -11,4 +11,6 @@ public record Fill
     public required decimal Quantity { get; init; }
     public required decimal Price { get; init; }
     public required DateTimeOffset ExchangeTimestamp { get; init; }
+    public required FillStatus Status { get; init; }
+
 }
