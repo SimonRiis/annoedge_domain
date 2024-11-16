@@ -7,6 +7,6 @@ namespace domain.algobook;
 public record AlgoBook
 {
     public required Book Book {get; init;}
-    public required Guid Id {get; init;}
+    public required Guid Id {get; init;} //THIS MIGHT NOT BE NEEDED TODO
     public required Algo Algo {get; init;}
 }

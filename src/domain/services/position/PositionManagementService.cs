@@ -1,4 +1,8 @@
-﻿using domain.order;
+﻿
+using domain.algobook;
+using domain.book;
+using domain.exchangebook;
+using domain.order;
 using domain.position;
 using domain.shared;
 using domain.shared.enums;
@@ -9,57 +13,125 @@ using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionManagementService(IOrderService orderService, IPositionService positionService, IUnitOfWork unitOfWork) : IPositionManagementService
+    public class PositionManagementService(IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork) : IPositionManagementService
     {
+        private Fin<Unit> ProcessBookAllocation(
+        Book exchangeBook,
+        Book legBook,
+        Product product,
+        Direction direction,
+        decimal volume,
+        decimal price)
+        {
+            return ProcessBooks(exchangeBook, legBook);
 
-        private async Task<Fin<Unit>> ProcessPosition(Position position, Order order) {
+            Fin<Unit> ProcessBooks(Book exchangeBook, Book legBook)
+            {
+                Func<Book, BookEntry, Fin<Unit>> updateAction = direction == Direction.LONG
+                    ? (book, entry) => book.IncreaseBookEntryQuantity(entry.Id, volume, price)
+                    : (book, entry) => book.DecreaseBookEntryQuantity(entry.Id, volume);
+
+                var exchangeBookUpdateRes = UpdateBook(exchangeBook, "exchange", updateAction);
+                var legBookUpdateRes = UpdateBook(legBook, "leg", updateAction);
+
+                if (exchangeBookUpdateRes.IsSucc && legBookUpdateRes.IsSucc)
+                {
+                    return FinSucc(unit);
+                }
+
+                return FinFail<Unit>("Failed to process one or more book updates.");
+            }
+
+            Fin<Unit> UpdateBook(Book book, string bookType, Func<Book, BookEntry, Fin<Unit>> updateAction)
+            {
+                return book.GetBookEntryByProductId(product.Id).Match(
+                    Some: entry => updateAction(book, entry),
+                    None: () => FinFail<Unit>($"Could not find {bookType} book entry for product: {product.Id}")
+                );
+            }
+        }
+
+
+        private async Task<Fin<Unit>> ProcessPosition(Position position, Order order)
+        {
 
             var fillsForPosition = order.Fills.OrderBy(x => x.ExchangeTimestamp);
             var exchange = order.Exchange;
             var product = order.Product;
-            var leg = position.Legs.FirstOrDefault(l => l.Product.Id == product.Id && l.Exchange.Id == exchange.Id);
+            var leg = position.Legs.FirstOrDefault(l => l.Product.Id == product.Id && l.Exchange.Id == exchange.Id); //TODO change to be method on position
 
             if (leg == null)
             {
                 return Error.New($"Could not find leg: productId: {product.Id} and Exchange: {exchange.Id}");
             }
 
-            fillsForPosition.Iter(fill =>
-            {
-                if (fill.Direction == Direction.LONG)
+            var legBookRes = await bookService.GetForId(leg.BookId);
+            var exchangeBookRes = await bookService.GetForExchange(exchange);
+
+            return await exchangeBookRes.Match(
+
+                Some: async exchangeBook =>
                 {
-                    position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price);
-                    order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied); //Fill is now fully applied
-                }
-                else if (fill.Direction == Direction.SHORT)
-                {
-                    position.DecreaseLeg(leg.Id, fill.Quantity);
-                    order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied); //Fill is now fully applied
-                }
-            });
+                    return await legBookRes.Match(
 
+                        Some: async legBook =>
+                        {
+                            var results = fillsForPosition.Select(fill =>
+                            {
+                                if (fill.Direction == Direction.LONG)
+                                {
+                                    return
+                                    position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
+                                    .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                    .Bind(_ => ProcessBookAllocation(exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                }
+                                else if (fill.Direction == Direction.SHORT)
+                                {
+                                    return position.DecreaseLeg(leg.Id, fill.Quantity)
+                                        .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                        .Bind(_ => ProcessBookAllocation(exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                }
+                                else
+                                {
+                                    return FinFail<Unit>($"Unkown direction for fill: {fill.Id}"); // Return success for other cases if needed
+                                }
+                            }).ToList(); // Collect all results
 
-            await unitOfWork.Begin();
-            var positionRes = positionService.UpdateAsync(position);
-            var orderRes = orderService.UpdateAsync(order);
-            var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes };
-            var res = await Task.WhenAll(taskList);
+                            if (results.Fails().Any())
+                            {
+                                return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
+                            }
 
-            if(res.All(result => result.IsSucc))
-            {
-                await unitOfWork.Commit();
-                return FinSucc(Unit.Default);
-            }
-            else
-            {
-                await unitOfWork.Rollback();
-                return FinFail<Unit>(string.Join(", ", res.Fails().Select(r => r.Message)));
-            }
+                            await unitOfWork.Begin();
+                            var positionRes = positionService.UpdateAsync(position);
+                            var orderRes = orderService.UpdateAsync(order);
+                            var legBookUpdateRes = bookService.UpdateAsync(legBook);
+                            var exchangeBookUpdateRes = bookService.UpdateAsync(exchangeBook);
+                            var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes, legBookUpdateRes, exchangeBookUpdateRes };
+                            var res = await Task.WhenAll(taskList);
 
+                            if (res.All(result => result.IsSucc))
+                            {
+                                await unitOfWork.Commit();
+                                return FinSucc(Unit.Default);
+                            }
+                            else
+                            {
+                                await unitOfWork.Rollback();
+                                return FinFail<Unit>(string.Join(", ", res.Fails().Select(r => r.Message)));
+                            }
+                        },
+                        None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
+                        );
+                },
+                None: () => Task.FromResult(FinFail<Unit>("Could not find exchange book"))
+                );
         }
 
         private async Task<Fin<Unit>> ProcessOrder(Order order)
         {
+
+
             var position = await positionService.GetPositionForOrderIdAsync(order.Id.InternalId);
             return await position.Match(
                 Succ: async position => await ProcessPosition(position, order),

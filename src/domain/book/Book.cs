@@ -9,6 +9,7 @@ public class Book(IBookEntryService bookEntryService)
     private readonly List<BookEntry> _entries = [];
     public IReadOnlyCollection<BookEntry> Entries => _entries.AsReadOnly();
 
+    public Option<BookEntry> GetBookEntryByProductId(Guid productId) => _entries.Find(b => b.Product.Id == productId);
     public Option<BookEntry> GetBookEntryById(Guid bookEntryId) => _entries.Find(b => b.Id == bookEntryId);
     public Fin<Unit> AddBookEntry(BookEntry bookEntry)
     {
