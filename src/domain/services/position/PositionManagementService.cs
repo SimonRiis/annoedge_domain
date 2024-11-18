@@ -68,8 +68,8 @@ namespace domain.services.position
             }
 
             var legBookRes = await bookService.GetForId(leg.BookId);
-            var exchangeBookRes = await bookService.GetForExchange(exchange);
-            var globalBookRes = await bookService.GetForId(globalBookId);
+            var exchangeBookRes = await bookService.GetForId(exchange.AggregatedBookId); // main aggregated exchange book
+            var globalBookRes = await bookService.GetForId(globalBookId);  // global aggregated exchange book
 
             return await globalBookRes.Match(
 
@@ -140,7 +140,6 @@ namespace domain.services.position
         private async Task<Fin<Unit>> ProcessOrder(Order order)
         {
 
-
             var position = await positionService.GetPositionForOrderIdAsync(order.Id.InternalId);
             return await position.Match(
                 Succ: async position => await ProcessPosition(position, order),
@@ -171,18 +170,11 @@ namespace domain.services.position
             return await orders.Match(
                 async orders =>
                 {
-                    var tasks = orders.Select(async order =>
-                        await order.Match(
-                            async o => await ProcessOrder(o),
-                            error => Task.FromResult(FinFail<Unit>(error))
-                        )
-                    );
+                    var tasks = orders.Select(async order => await ProcessOrder(order));
 
                     var results = await Task.WhenAll(tasks);
 
-                    return results.All(result => result.IsSucc)
-                        ? FinSucc(Unit.Default)
-                        : FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
+                    return results.FlattenResult();
                 },
                 error => Task.FromResult(FinFail<Unit>(error))
             );

@@ -1,5 +1,4 @@
 ﻿using domain.order;
-using domain.shared.enums;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
@@ -53,7 +52,7 @@ namespace domain.position
 
         private async Task<Fin<Position>> ProcessPosition(Position position)
         {
-            var positionLegs = await positionLegRepository.QueryAsync($"select * from position_leg where position_id ={position.Id}");
+            var positionLegs = await positionLegRepository.GetAllForPosition(position.Id);
             return positionLegs.Match(
                 Succ: legs =>
                 {
@@ -78,103 +77,34 @@ namespace domain.position
             ));
         }
 
-        public Fin<Position> UpdatePositionLegs(Position position, IEnumerable<Order> orders)
+        private Task<Fin<Unit>> UpdateLegs(Position position)
         {
-            var groupedOrders = orders
-                .GroupBy(order => order.Exchange.Id)
-                .ToDictionary(
-                    exchangeGroup => exchangeGroup.Key,
-                    exchangeGroup => exchangeGroup
-                        .GroupBy(order => order.Product.Id)
-                        .ToDictionary(
-                            productGroup => productGroup.Key,
-                            productGroup => productGroup.ToList()
-                        )
-                );
-
-            var aggregatedPosition = new Position(position.Id, PositionStatus.PENDING, DateTimeOffset.UtcNow, position.PositionMandate, positionLegService);
-
-            foreach (var item in groupedOrders)
+            return Task.WhenAll(position.Legs.Select(positionLegRepository.UpdateAsync)).ContinueWith(task =>
             {
-                foreach (var productGroup in item.Value)
-                {
-                    var ordersForProductOnExchange = productGroup.Value;
-
-                    foreach (var order in ordersForProductOnExchange)
-                    {
-                        var fills = order.Fills.OrderBy(f => f.ExchangeTimestamp);
-                        var exchange = order.Exchange;
-                        var product = order.Product;
-
-                        var existingLeg = aggregatedPosition.Legs.FirstOrDefault(l => l.Product.Id == product.Id && l.Exchange.Id == exchange.Id);
-                        Option<PositionLeg> workLeg = None;
-                        if (existingLeg is not null)
-                        {
-                            workLeg = Some(existingLeg with { AverageEntryPrice = 0, Quantity = 0, LastUpdated = DateTimeOffset.UtcNow });
-                        }
-                        else
-                        {
-                            var newLeg = new PositionLeg
-                            {
-                                AverageEntryPrice = 0,
-                                Exchange = exchange,
-                                Id = Guid.NewGuid(),
-                                LastUpdated = DateTimeOffset.UtcNow,
-                                Direction = order.Direction,
-                                Product = product,
-                                Quantity = 0
-                            };
-                            aggregatedPosition.AddLeg(newLeg);
-                            workLeg = Some(newLeg);
-                        }
-
-                        var legRes = workLeg.Match(
-                            Some: leg =>
-                            {
-                                var res = fills.Select(fill =>
-                                {
-
-                                    if (fill.Direction == Direction.LONG)
-                                    {
-                                        return aggregatedPosition.IncreaseLeg(leg.Id, fill.Quantity, fill.Price);
-                                    }
-                                    else if (fill.Direction == Direction.SHORT)
-                                    {
-                                        return aggregatedPosition.DecreaseLeg(leg.Id, fill.Quantity);
-                                    }
-                                    else
-                                    {
-                                        return Error.New("Invalid direction");
-                                    }
-                                }
-                                ).ToList();
-
-                                return res.All(r => r.IsSucc)
-                                    ? FinSucc(unit)
-                                    : Error.New(string.Join(", ", res.Where(r => r.IsFail).Select(f => f.Match(Fail: err => err.Message, Succ: _ => ""))));
-                            },
-                            None: () => Error.New("Leg not found")
-                        );
-
-                        if (legRes.IsFail)
-                        {
-                            return Error.New(legRes.Match(Fail: err => err.Message, Succ: _ => ""));
-                        }
-                    }
-                }
-            }
-
-            return FinSucc(aggregatedPosition);
+                if (task.Result.All(r => r.IsSucc))
+                    return FinSucc(Unit.Default);
+                else
+                    return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
+            });
         }
 
-        public Task<Fin<Unit>> UpdateAsync(Position position)
+        public async Task<Fin<Unit>> UpdateAsync(Position position)
         {
-            throw new NotImplementedException();
+            var positionRes = positionRepository.UpdateAsync(position);
+            var positionLegsRes = UpdateLegs(position);
+            var tasks= new List<Task<Fin<Unit>>> { positionRes, positionLegsRes };
+            var results = await Task.WhenAll(tasks);
+
+            return results.FlattenResult();
         }
 
-        public Task<Fin<Position>> GetPositionForOrderIdAsync(Guid orderId)
+        public async Task<Fin<Position>> GetPositionForOrderIdAsync(Guid orderId)
         {
-            throw new NotImplementedException();
+            var positionRes = await positionRepository.GetForOrderId(orderId);
+            return await positionRes.Match(
+                Some: async position => { return await ProcessPosition(position);},
+                None: () => Task.FromResult(FinFail<Position>($"Could not find position for order: {orderId}"))
+            );
         }
     }
 }

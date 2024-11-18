@@ -8,6 +8,6 @@ namespace domain.services.order
 {
     public interface IOrderProvider
     {
-        public Task<IEnumerable<OrderDTO>> GetOrders();
+        public Task<IEnumerable<OrderDTO>> GetOrders(DateTimeOffset from, DateTimeOffset to);
     }
 }

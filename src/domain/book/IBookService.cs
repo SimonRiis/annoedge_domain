@@ -10,7 +10,6 @@ namespace domain.book
 {
     public interface IBookService
     {
-        public Task<Option<Book>> GetForExchange(Exchange exchange);
         public Task<Option<Book>> GetForId(Guid id);
         public Task<Fin<Unit>> UpdateAsync(Book book);
     }
