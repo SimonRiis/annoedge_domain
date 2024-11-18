@@ -13,9 +13,10 @@ using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionManagementService(IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork) : IPositionManagementService
+    public class PositionManagementService(IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
     {
         private Fin<Unit> ProcessBookAllocation(
+        Book globalBook,
         Book exchangeBook,
         Book legBook,
         Product product,
@@ -23,18 +24,19 @@ namespace domain.services.position
         decimal volume,
         decimal price)
         {
-            return ProcessBooks(exchangeBook, legBook);
+            return ProcessBooks(globalBook, exchangeBook, legBook);
 
-            Fin<Unit> ProcessBooks(Book exchangeBook, Book legBook)
+            Fin<Unit> ProcessBooks(Book globalBook, Book exchangeBook, Book legBook)
             {
                 Func<Book, BookEntry, Fin<Unit>> updateAction = direction == Direction.LONG
                     ? (book, entry) => book.IncreaseBookEntryQuantity(entry.Id, volume, price)
                     : (book, entry) => book.DecreaseBookEntryQuantity(entry.Id, volume);
-
+                
+                var globalBookUpdateRes = UpdateBook(globalBook, "exchange", updateAction);
                 var exchangeBookUpdateRes = UpdateBook(exchangeBook, "exchange", updateAction);
                 var legBookUpdateRes = UpdateBook(legBook, "leg", updateAction);
 
-                if (exchangeBookUpdateRes.IsSucc && legBookUpdateRes.IsSucc)
+                if (exchangeBookUpdateRes.IsSucc && exchangeBookUpdateRes.IsSucc && legBookUpdateRes.IsSucc)
                 {
                     return FinSucc(unit);
                 }
@@ -67,65 +69,72 @@ namespace domain.services.position
 
             var legBookRes = await bookService.GetForId(leg.BookId);
             var exchangeBookRes = await bookService.GetForExchange(exchange);
+            var globalBookRes = await bookService.GetForId(globalBookId);
 
-            return await exchangeBookRes.Match(
+            return await globalBookRes.Match(
 
-                Some: async exchangeBook =>
+                Some: async globalBook =>
                 {
-                    return await legBookRes.Match(
+                    return await exchangeBookRes.Match(
 
-                        Some: async legBook =>
+                        Some: async exchangeBook =>
                         {
-                            var results = fillsForPosition.Select(fill =>
-                            {
-                                if (fill.Direction == Direction.LONG)
-                                {
-                                    return
-                                    position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
-                                    .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
-                                    .Bind(_ => ProcessBookAllocation(exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
-                                }
-                                else if (fill.Direction == Direction.SHORT)
-                                {
-                                    return position.DecreaseLeg(leg.Id, fill.Quantity)
-                                        .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
-                                        .Bind(_ => ProcessBookAllocation(exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
-                                }
-                                else
-                                {
-                                    return FinFail<Unit>($"Unkown direction for fill: {fill.Id}"); // Return success for other cases if needed
-                                }
-                            }).ToList(); // Collect all results
+                            return await legBookRes.Match(
 
-                            if (results.Fails().Any())
-                            {
-                                return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
-                            }
+                                Some: async legBook =>
+                                {
+                                    var results = fillsForPosition.Select(fill =>
+                                    {
+                                        if (fill.Direction == Direction.LONG)
+                                        {
+                                            return
+                                            position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
+                                            .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                            .Bind(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                        }
+                                        else if (fill.Direction == Direction.SHORT)
+                                        {
+                                            return position.DecreaseLeg(leg.Id, fill.Quantity)
+                                                .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                                .Bind(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                        }
+                                        else
+                                        {
+                                            return FinFail<Unit>($"Unkown direction for fill: {fill.Id}"); // Return success for other cases if needed
+                                        }
+                                    }).ToList(); // Collect all results
 
-                            await unitOfWork.Begin();
-                            var positionRes = positionService.UpdateAsync(position);
-                            var orderRes = orderService.UpdateAsync(order);
-                            var legBookUpdateRes = bookService.UpdateAsync(legBook);
-                            var exchangeBookUpdateRes = bookService.UpdateAsync(exchangeBook);
-                            var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes, legBookUpdateRes, exchangeBookUpdateRes };
-                            var res = await Task.WhenAll(taskList);
+                                    if (results.Fails().Any())
+                                    {
+                                        return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
+                                    }
 
-                            if (res.All(result => result.IsSucc))
-                            {
-                                await unitOfWork.Commit();
-                                return FinSucc(Unit.Default);
-                            }
-                            else
-                            {
-                                await unitOfWork.Rollback();
-                                return FinFail<Unit>(string.Join(", ", res.Fails().Select(r => r.Message)));
-                            }
+                                    await unitOfWork.Begin();
+                                    var positionRes = positionService.UpdateAsync(position);
+                                    var orderRes = orderService.UpdateAsync(order);
+                                    var globalBookUpdateRes = bookService.UpdateAsync(globalBook);
+                                    var legBookUpdateRes = bookService.UpdateAsync(legBook);
+                                    var exchangeBookUpdateRes = bookService.UpdateAsync(exchangeBook);
+                                    var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes, globalBookUpdateRes, legBookUpdateRes, exchangeBookUpdateRes };
+                                    var res = await Task.WhenAll(taskList);
+
+                                    if (res.All(result => result.IsSucc))
+                                    {
+                                        await unitOfWork.Commit();
+                                        return FinSucc(Unit.Default);
+                                    }
+                                    else
+                                    {
+                                        await unitOfWork.Rollback();
+                                        return FinFail<Unit>(string.Join(", ", res.Fails().Select(r => r.Message)));
+                                    }
+                                },
+                                None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
+                                );
                         },
-                        None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
-                        );
+                        None: () => Task.FromResult(FinFail<Unit>("Could not find exchange book")));
                 },
-                None: () => Task.FromResult(FinFail<Unit>("Could not find exchange book"))
-                );
+                None: () => Task.FromResult(FinFail<Unit>("Could not find global book")));
         }
 
         private async Task<Fin<Unit>> ProcessOrder(Order order)
@@ -142,6 +151,11 @@ namespace domain.services.position
         public async Task<Fin<Unit>> UpdatePositions()
         {
             // Get all orders with unhandled fills
+
+            //TODO: When supporting limit orders we need to loop over fills and get the order for the fill
+            //This is due to the fact that we need to allocate the books in the right order. 
+            //However book allocation might be splitted out into a different service.
+
             var orders = await orderService.GetOrdersWithUnhandledFills();
 
             // Get all positions for the orders
