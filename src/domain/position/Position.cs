@@ -1,3 +1,4 @@
+using domain.shared.enums;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
@@ -97,5 +98,31 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
                 .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
             None: () => Error.New($"Position leg {legId} not found.")
         );
+    }
+
+    public Fin<Unit> AddPositionLegIntent(PositionLeg positionLeg, Direction direction, decimal quantity, decimal priceTarget)
+    {
+        var intent = new PositionLegIntent
+        {
+            CreatedAt = DateTimeOffset.UtcNow,
+            Direction = direction,
+            Id = Guid.NewGuid(),
+            PriceTarget = priceTarget,
+            Quantity = quantity,
+            Status = shared.enums.Status.Pending,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg, leg));
+    }
+    public Fin<Unit> DecreasePositionLegIntent(PositionLeg positionLeg, Guid intentId, decimal quantity)
+    {
+        var intent = positionLeg.GetLegIntentById(intentId);
+
+        return intent.Match(Some: legIntent =>
+        {
+            return positionLeg.DecreaseIntentQuantity(legIntent, quantity).Bind(leg => UpdateLeg(positionLeg, leg));
+
+        }, None: () => Error.New($"Position leg intent {intentId} not found."));
     }
 }

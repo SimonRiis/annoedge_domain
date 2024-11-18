@@ -13,8 +13,4 @@
     <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="factories\" />
-  </ItemGroup>
-
 </Project>

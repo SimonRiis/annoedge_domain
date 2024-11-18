@@ -1,6 +1,6 @@
 ﻿namespace domain.shared.enums
 {
-    public enum OrderStatus
+    public enum Status
     {
         Pending,
         PartiallyFilled,

@@ -16,7 +16,7 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
     public decimal Quantity { get; init; } = quantity;
     public decimal Price { get; init; } = price;
     public Exchange Exchange { get; init; } = exchange;
-    public OrderStatus Status { get; private set; } = OrderStatus.Pending;
+    public Status Status { get; private set; } = Status.Pending;
     public DateTimeOffset LastUpdated { get; private set; } = lastUpdated;
     public DateTimeOffset ExchangeTimestamp { get; init; } = exchangeTimestamp;
 
@@ -79,15 +79,15 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
 
         if (filledQuantity == 0)
         {
-            Status = OrderStatus.Pending;
+            Status = Status.Pending;
         }
         else if (filledQuantity < Quantity)
         {
-            Status = OrderStatus.PartiallyFilled;
+            Status = Status.PartiallyFilled;
         }
         else if (filledQuantity >= Quantity)
         {
-            Status = OrderStatus.Filled;
+            Status = Status.Filled;
         }
     }
 }
