@@ -23,6 +23,15 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
 
         return Id == other.Id;
     }
+    public Fin<Unit> UpdateStatusBasedOnIntents()
+    {
+        var hasUnmatchedIntents = Legs
+        .Select(leg => leg.GetOpenUnfilledQuantity())
+        .Any(qty => qty.Match(Succ: q => q > 0, Fail: _ => false));
+
+        Status = hasUnmatchedIntents ? PositionStatus.PENDING : PositionStatus.OPEN;
+        return FinSucc(Unit.Default);
+    }
 
     // Override Equals(object obj) for general equality comparison
     public override bool Equals(object? obj) =>
@@ -115,14 +124,20 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
 
         return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg, leg));
     }
-    public Fin<Unit> DecreasePositionLegIntent(PositionLeg positionLeg, Guid intentId, decimal quantity)
+    public Fin<decimal> DecreasePositionLegIntent(PositionLeg positionLeg, decimal quantity)
     {
-        var intent = positionLeg.GetLegIntentById(intentId);
-
-        return intent.Match(Some: legIntent =>
-        {
-            return positionLeg.DecreaseIntentQuantity(legIntent, quantity).Bind(leg => UpdateLeg(positionLeg, leg));
-
-        }, None: () => Error.New($"Position leg intent {intentId} not found."));
+        var leg = GetLegById(positionLeg.Id);
+        return leg.Match(
+            Some: l => positionLegService.UpdateIntents(l, quantity)
+                .Bind(updatedLeg =>
+                {
+                    var updateResult = UpdateLeg(l, updatedLeg.UpdatedLeg);
+                    return updateResult.Match(
+                        Succ: _ => FinSucc(updatedLeg.RemainingQuantity), // Return leftover quantity
+                        Fail: e => Error.New($"Failed to update leg {l.Id}. Error: {e}")
+                    );
+                }),
+            None: () => Error.New($"Position leg {positionLeg.Id} not found.")
+        );
     }
 }

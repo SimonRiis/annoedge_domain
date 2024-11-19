@@ -9,11 +9,12 @@ using domain.shared.enums;
 using domain.shared.repositories;
 using LanguageExt;
 using LanguageExt.Common;
+using Microsoft.Extensions.Logging;
 using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionManagementService(IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
+    public class PositionManagementService(ILogger logger, IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
     {
         private Fin<Unit> ProcessBookAllocation(
         Book globalBook,
@@ -85,18 +86,37 @@ namespace domain.services.position
                                 {
                                     var results = fillsForPosition.Select(fill =>
                                     {
+
+                                        if(fill.Direction == leg.direction)
+                                        {
+                                            //same direction as leg, meaning we are adding to the position update intents
+                                            var _ = position.DecreasePositionLegIntent(leg, fill.Quantity).Bind<Fin<Unit>>(qty =>
+                                            {
+                                                if(qty < 0)
+                                                {
+                                                    //When adding support for intent based qty match for positions, the excess qty returned should be matched to the next position. 
+                                                    //Basically we need to loop over the fills and match them to the intents in the right order. 
+                                                    //And only go on to the next fill when all the qty to match for the current fill is matched.
+                                                    logger.LogError($"Excess fill quantity for position: {position.Id}, leg: {leg.Id} and fill: {fill.Id} with quantity: {qty}");
+                                                }
+                                                return FinSucc(Unit.Default);
+                                            }
+                                            );
+                                        }
+
                                         if (fill.Direction == Direction.LONG)
                                         {
                                             return
                                             position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
-                                            .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
-                                            .Bind(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                           
+                                            .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                            .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
                                         else if (fill.Direction == Direction.SHORT)
                                         {
                                             return position.DecreaseLeg(leg.Id, fill.Quantity)
-                                                .Bind(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
-                                                .Bind(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                                .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                                .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
                                         else
                                         {
@@ -108,6 +128,9 @@ namespace domain.services.position
                                     {
                                         return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
                                     }
+
+                                    //update position status
+                                    var _ = position.UpdateStatusBasedOnIntents();
 
                                     await unitOfWork.Begin();
                                     var positionRes = positionService.UpdateAsync(position);
@@ -139,7 +162,6 @@ namespace domain.services.position
 
         private async Task<Fin<Unit>> ProcessOrder(Order order)
         {
-
             var position = await positionService.GetPositionForOrderIdAsync(order.Id.InternalId);
             return await position.Match(
                 Succ: async position => await ProcessPosition(position, order),
@@ -150,36 +172,60 @@ namespace domain.services.position
         public async Task<Fin<Unit>> UpdatePositions()
         {
             // Get all orders with unhandled fills
-
-            //TODO: When supporting limit orders we need to loop over fills and get the order for the fill
-            //This is due to the fact that we need to allocate the books in the right order. 
-            //However book allocation might be splitted out into a different service.
-
             var orders = await orderService.GetOrdersWithUnhandledFills();
 
-            // Get all positions for the orders
-
-            //    var orderIds = orders.OrderBy(x => x.ExchangeTimestamp).Select(o => o.Id.InternalId).ToList();
-
-            //Get grouped positions for the orders
-            //Note that a position can be for multiple orders, but one order can only have one position
-            //That will change when intent based volume mapping is added
-            //But that means that we now can loop over the orders, and apply all the fills for that order to the position
-
-            // Process each order asynchronously
             return await orders.Match(
                 async orders =>
                 {
-                    var tasks = orders.Select(async order => await ProcessOrder(order));
+                    foreach (var order in orders.OrderBy(o => o.ExchangeTimestamp))
+                    {
+                        var result = await ProcessOrder(order);
 
-                    var results = await Task.WhenAll(tasks);
+                        if (result.IsFail)
+                        {
+                            return FinFail<Unit>($"Failed to process order {order.Id}");
+                        }
+                    }
 
-                    return results.FlattenResult();
+                    return FinSucc(Unit.Default);
                 },
                 error => Task.FromResult(FinFail<Unit>(error))
             );
-
         }
+
+        //public async Task<Fin<Unit>> UpdatePositions()
+        //{
+        //    // Get all orders with unhandled fills
+
+        //    //TODO: When supporting limit orders we need to loop over fills and get the order for the fill
+        //    //This is due to the fact that we need to allocate the books in the right order. 
+        //    //However book allocation might be splitted out into a different service.
+
+        //    var orders = await orderService.GetOrdersWithUnhandledFills();
+
+        //    // Get all positions for the orders
+
+        //    //    var orderIds = orders.OrderBy(x => x.ExchangeTimestamp).Select(o => o.Id.InternalId).ToList();
+
+        //    //Get grouped positions for the orders
+        //    //Note that a position can be for multiple orders, but one order can only have one position
+        //    //That will change when intent based volume mapping is added
+        //    //But that means that we now can loop over the orders, and apply all the fills for that order to the position
+
+        //    // Process each order asynchronously
+        //    return await orders.Match(
+        //        async orders =>
+        //        {
+        //            var tasks = orders.Select(async order => await ProcessOrder(order));
+
+        //            var results = await Task.WhenAll(tasks);
+
+        //            return results.FlattenResult();
+        //        },
+        //        error => Task.FromResult(FinFail<Unit>(error))
+        //    );
+
+        //}
     }
 }
 
