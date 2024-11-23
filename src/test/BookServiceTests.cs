@@ -9,14 +9,14 @@ using LanguageExt;
 using static LanguageExt.Prelude;
 using domain.book;
 using domain.shared;
-using BookService = domain.shared.services.BookService;
+using BookService = domain.services.book.BookService;
 
 namespace test
 {
     [TestClass]
     public class BookServiceTests
     {
-        private domain.shared.services.BookService _bookService;
+        private BookService _bookService;
 
         [TestInitialize]
         public void Setup()
@@ -51,7 +51,7 @@ namespace test
 
             book1.AddBookEntry(bookEntry);
 
-            var exchange = new Exchange { Name = "KRAKEN", Id = Guid.NewGuid(), AggregatedBookId = Guid.NewGuid() };
+            var exchange = new Exchange { Name = "KRAKEN", Id = Guid.NewGuid(), DefaultBookId = Guid.NewGuid() };
 
             var exchangeBooks = new List<ExchangeBook>
             {
@@ -122,7 +122,7 @@ namespace test
             var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 1 };
             book2.AddBookEntry(bookEntry2);
 
-            var exchange = new Exchange { Name = "KRAKEN", Id = exchangeId, AggregatedBookId = Guid.NewGuid() };
+            var exchange = new Exchange { Name = "KRAKEN", Id = exchangeId, DefaultBookId = Guid.NewGuid() };
 
             var exchangeBooks = new List<ExchangeBook>
             {
@@ -186,7 +186,7 @@ namespace test
                 Book = book1
             };
 
-            var exchange = new Exchange { Name = "KRAKEN", Id = Guid.NewGuid(), AggregatedBookId = Guid.NewGuid() };
+            var exchange = new Exchange { Name = "KRAKEN", Id = Guid.NewGuid(), DefaultBookId = Guid.NewGuid() };
 
             var exchangeBooks = new List<ExchangeBook>
             {
@@ -252,7 +252,7 @@ namespace test
                 Book = book1
             };
 
-            var exchange = new Exchange { Name = "KRAKEN", Id = exchangeId, AggregatedBookId = Guid.NewGuid() };
+            var exchange = new Exchange { Name = "KRAKEN", Id = exchangeId, DefaultBookId = Guid.NewGuid() };
 
             var exchangeBooks = new List<ExchangeBook>
             {

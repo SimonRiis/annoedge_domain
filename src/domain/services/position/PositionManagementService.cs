@@ -69,7 +69,7 @@ namespace domain.services.position
             }
 
             var legBookRes = await bookService.GetForId(leg.BookId);
-            var exchangeBookRes = await bookService.GetForId(exchange.AggregatedBookId); // main aggregated exchange book
+            var exchangeBookRes = await bookService.GetForId(exchange.DefaultBookId); // main aggregated exchange book
             var globalBookRes = await bookService.GetForId(globalBookId);  // global aggregated exchange book
 
             return await globalBookRes.Match(
