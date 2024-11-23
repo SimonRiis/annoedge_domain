@@ -1,3 +1,4 @@
+using domain.shared.enums;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
@@ -12,12 +13,24 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     private readonly List<PositionLeg> _legs = [];
     public IReadOnlyCollection<PositionLeg> Legs => _legs.AsReadOnly();
 
+    private readonly List<PositionOrderMap> _positionOrderMaps = [];
+    public IReadOnlyCollection<PositionOrderMap> PositionOrderMaps => _positionOrderMaps.AsReadOnly();
+
     public bool Equals(Position? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
 
         return Id == other.Id;
+    }
+    public Fin<Unit> UpdateStatusBasedOnIntents()
+    {
+        var hasUnmatchedIntents = Legs
+        .Select(leg => leg.GetOpenUnfilledQuantity())
+        .Any(qty => qty.Match(Succ: q => q > 0, Fail: _ => false));
+
+        Status = hasUnmatchedIntents ? PositionStatus.PENDING : PositionStatus.OPEN;
+        return FinSucc(Unit.Default);
     }
 
     // Override Equals(object obj) for general equality comparison
@@ -28,6 +41,15 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     public override int GetHashCode()
     {
         return HashCode.Combine(Id);
+    }
+
+    public Fin<Unit> AddPositionOrderMap(PositionOrderMap positionOrderMap)
+    {
+        if (_positionOrderMaps.Any(pom => pom.OrderId == positionOrderMap.OrderId))
+            return Error.New("PositionOrderMap already exists for this order");
+
+        _positionOrderMaps.Add(positionOrderMap);
+        return FinSucc(unit);
     }
 
     public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal takeprofitpct)
@@ -84,6 +106,38 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
             Some: l => positionLegService.DecreaseQuantity(l, decreaseQuantity)
                 .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
             None: () => Error.New($"Position leg {legId} not found.")
+        );
+    }
+
+    public Fin<Unit> AddPositionLegIntent(PositionLeg positionLeg, Direction direction, decimal quantity, decimal priceTarget)
+    {
+        var intent = new PositionLegIntent
+        {
+            CreatedAt = DateTimeOffset.UtcNow,
+            Direction = direction,
+            Id = Guid.NewGuid(),
+            PriceTarget = priceTarget,
+            Quantity = quantity,
+            Status = shared.enums.Status.Pending,
+            UpdatedAt = DateTimeOffset.UtcNow
+        };
+
+        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg, leg));
+    }
+    public Fin<decimal> DecreasePositionLegIntent(PositionLeg positionLeg, decimal quantity)
+    {
+        var leg = GetLegById(positionLeg.Id);
+        return leg.Match(
+            Some: l => positionLegService.UpdateIntents(l, quantity)
+                .Bind(updatedLeg =>
+                {
+                    var updateResult = UpdateLeg(l, updatedLeg.UpdatedLeg);
+                    return updateResult.Match(
+                        Succ: _ => FinSucc(updatedLeg.RemainingQuantity), // Return leftover quantity
+                        Fail: e => Error.New($"Failed to update leg {l.Id}. Error: {e}")
+                    );
+                }),
+            None: () => Error.New($"Position leg {positionLeg.Id} not found.")
         );
     }
 }
