@@ -1,25 +1,22 @@
+using domain.position;
 using domain.shared;
+using domain.shared.enums;
 using LanguageExt;
 using LanguageExt.Common;
 using static LanguageExt.Prelude;
 namespace domain.order;
 
-public enum OrderStatus
-{
-    Pending,
-    PartiallyFilled,
-    Filled,
-    Canceled
-}
 
-public class Order(Product product, Exchange exchange, Guid id, decimal quantity, decimal price, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
+
+public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal quantity, decimal price, Direction direction, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
 {
-    public Guid Id { get; init; } = id;
+    public Direction Direction { get; init; } = direction;
+    public ExchangeMapId Id { get; init; } = id;
     public Product Product { get; init; } = product;
     public decimal Quantity { get; init; } = quantity;
     public decimal Price { get; init; } = price;
     public Exchange Exchange { get; init; } = exchange;
-    public OrderStatus Status { get; private set; } = OrderStatus.Pending;
+    public Status Status { get; private set; } = Status.Pending;
     public DateTimeOffset LastUpdated { get; private set; } = lastUpdated;
     public DateTimeOffset ExchangeTimestamp { get; init; } = exchangeTimestamp;
 
@@ -31,7 +28,7 @@ public class Order(Product product, Exchange exchange, Guid id, decimal quantity
 
     public Fin<Unit> AddTrade(Trade trade)
     {
-        if (trade.OrderId != Id)
+        if (trade.OrderId.InternalId != Id.InternalId)
             return Error.New($"Trade with tradeId: {trade.Id} does not belong to this order.");
 
         _trades.Add(trade);
@@ -41,12 +38,37 @@ public class Order(Product product, Exchange exchange, Guid id, decimal quantity
 
     public Fin<Unit> AddFill(Fill fill)
     {
-        if (fill.OrderId != Id)
+        if (fill.OrderId.InternalId != Id.InternalId)
             return Error.New($"Fill with fillId: {fill.Id} does not belong to this order.");
 
         _fills.Add(fill);
         UpdateOrderStatus();
         return FinSucc(unit);
+    }
+
+    public Option<Fill> GetFillById(Guid fillId) => _fills.Find(f => f.Id.InternalId == fillId);
+
+    private Fin<Unit> UpdateFill(Fill oldFill, Fill updatedFill)
+    {
+        if (oldFill == null)
+            return Error.New("Fill not found");
+
+        _fills[_fills.IndexOf(oldFill)] = updatedFill;
+        return FinSucc(unit);
+    }
+
+    public Fin<Unit> UpdateFillStatus(Guid fillId, FillStatus status)
+    {
+        var fill = GetFillById(fillId);
+        return fill.Match(
+            Some: f => {
+
+                var updatedFill = f with { Status = status };
+                return UpdateFill(f, updatedFill);
+
+            },
+            None: () => Error.New($"Fill {fillId} not found.")
+        );
     }
 
     private void UpdateOrderStatus()
@@ -57,15 +79,15 @@ public class Order(Product product, Exchange exchange, Guid id, decimal quantity
 
         if (filledQuantity == 0)
         {
-            Status = OrderStatus.Pending;
+            Status = Status.Pending;
         }
         else if (filledQuantity < Quantity)
         {
-            Status = OrderStatus.PartiallyFilled;
+            Status = Status.PartiallyFilled;
         }
         else if (filledQuantity >= Quantity)
         {
-            Status = OrderStatus.Filled;
+            Status = Status.Filled;
         }
     }
 }

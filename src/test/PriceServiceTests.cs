@@ -49,7 +49,7 @@ namespace tests
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Additional Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Invalid quantity", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]
@@ -83,7 +83,7 @@ namespace tests
 
             // Assert
             Assert.IsTrue(result.IsFail);
-            Assert.AreEqual("Additional Quantity cannot be zero.", result.Match(Fail: err => err.Message, Succ: _ => ""));
+            Assert.AreEqual("Invalid quantity", result.Match(Fail: err => err.Message, Succ: _ => ""));
         }
 
         [TestMethod]

@@ -1,9 +1,11 @@
+using domain.shared.enums;
 using domain.shared.services;
 using LanguageExt;
+using Microsoft.Extensions.Logging;
 using static LanguageExt.Prelude;
 namespace domain.position;
 
-public class PositionLegService(IPriceService priceService, IQuantityService QuantityService) : IPositionLegService
+public class PositionLegService(ILogger logger, IPriceService priceService, IQuantityService QuantityService) : IPositionLegService
 {
     public Fin<PositionLeg> DecreaseQuantity(PositionLeg leg, decimal QuantityReduction)
     {
@@ -26,4 +28,49 @@ public class PositionLegService(IPriceService priceService, IQuantityService Qua
             });
         });
     }
+
+    public Fin<UpdateIntentsResult> UpdateIntents(PositionLeg leg, decimal filledQuantity)
+    {
+        var unfilledPositionIntents = leg.PositionLegIntents
+            .Where(i => i.Status != Status.Filled && i.Status != Status.Canceled)
+            .ToList();
+
+        return ProcessIntentsRecursively(leg, unfilledPositionIntents, filledQuantity);
+    }
+
+    private Fin<UpdateIntentsResult> ProcessIntentsRecursively(
+        PositionLeg leg,
+        List<PositionLegIntent> intents,
+        decimal remainingQuantity)
+    {
+        // Base case: no intents left or no remaining quantity to process
+        if (!intents.Any() || remainingQuantity <= 0)
+        {
+            return FinSucc(new UpdateIntentsResult(leg, remainingQuantity));
+        }
+
+        // Extract the first intent
+        var currentIntent = intents.First();
+        var quantityToDecrease = Math.Min(currentIntent.Quantity, remainingQuantity);
+
+        // Attempt to decrease the intent quantity
+        var updatedLeg = leg.DecreaseIntentQuantity(currentIntent, quantityToDecrease);
+
+        return updatedLeg.Match(
+            Succ: updated =>
+            {
+                // Recursive call with updated state
+                var remainingIntents = intents.Skip(1).ToList();
+                return ProcessIntentsRecursively(updated, remainingIntents, remainingQuantity - quantityToDecrease);
+            },
+            Fail: e =>
+            {
+                logger.LogError("Failed to decrease intent quantity: {Message}", e.Message);
+                // Skip the current intent if decreasing fails and proceed with the rest
+                var remainingIntents = intents.Skip(1).ToList();
+                return ProcessIntentsRecursively(leg, remainingIntents, remainingQuantity);
+            }
+        );
+    }
+
 }
