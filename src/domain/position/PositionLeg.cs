@@ -5,16 +5,16 @@ using LanguageExt.Common;
 using static LanguageExt.Prelude;
 namespace domain.position;
 
-public record PositionLeg(Guid id, Guid bookId, decimal quantity, decimal averageEntryPrice, DateTimeOffset lastUpdated, Product product, Direction direction, Exchange exchange)
+public record PositionLeg
 {
-    public required Guid Id { get; init; } = id;
-    public required Guid BookId { get; init; } = bookId;
-    public required decimal Quantity { get; init; } = quantity;
-    public required decimal AverageEntryPrice { get; init; } = averageEntryPrice;
-    public required DateTimeOffset LastUpdated { get; init; } = lastUpdated;
-    public required Product Product { get; init; } = product;
-    public required Direction Direction { get; init; } = direction;
-    public required Exchange Exchange { get; init; } = exchange;
+    public required Guid Id { get; init; }
+    public required Guid BookId { get; init; }
+    public required decimal Quantity { get; init; }
+    public required decimal AverageEntryPrice { get; init; }
+    public required DateTimeOffset LastUpdated { get; init; }
+    public required Product Product { get; init; }
+    public required Direction Direction { get; init; }
+    public required Exchange Exchange { get; init; }
     private List<PositionLegIntent> _intents = [];
     public IReadOnlyCollection<PositionLegIntent> PositionLegIntents => _intents.AsReadOnly();
 
