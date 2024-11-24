@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.9.0"></a>
+## [0.9.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.9.0) (2024-11-24)
+
+### Features
+
+* fix ([3997129](https://www.github.com/SimonRiis/annoedge_domain/commit/3997129868026dab5f664e69fe0ee81f81870d65))
+* fix ([7c161b5](https://www.github.com/SimonRiis/annoedge_domain/commit/7c161b560a08f62c99795eb7084ee19253a2f6a8))
+
 <a name="0.8.0"></a>
 ## [0.8.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.8.0) (2024-11-23)
 
