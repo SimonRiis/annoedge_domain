@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.11.0"></a>
+## [0.11.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.11.0) (2024-11-25)
+
+### Features
+
+* Add AddAsync to orderservice ([6d08c53](https://www.github.com/SimonRiis/annoedge_domain/commit/6d08c538f05459cf56d064f46929743bdeaadc6e))
+
 <a name="0.10.0"></a>
 ## [0.10.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.10.0) (2024-11-25)
 
