@@ -75,6 +75,8 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         var existingLeg = _legs.FirstOrDefault(l => l.Product.Id == leg.Product.Id && l.Exchange == leg.Exchange);
         if (existingLeg != null)
             return Error.New($"Position leg already exists for {leg.Product.Symbol} and {leg.Exchange} please increase leg instead");
+        if (!leg.PositionId.Equals(Id))
+            return Error.New($"Position leg belong to different position");
         _legs.Add(leg);
         return FinSucc(unit);
     }

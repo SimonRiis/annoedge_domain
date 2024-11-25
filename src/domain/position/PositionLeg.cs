@@ -8,6 +8,7 @@ namespace domain.position;
 public record PositionLeg
 {
     public required Guid Id { get; init; }
+    public required Guid PositionId { get; init; }
     public required Guid BookId { get; init; }
     public required decimal Quantity { get; init; }
     public required decimal AverageEntryPrice { get; init; }
