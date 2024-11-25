@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.10.0"></a>
+## [0.10.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.10.0) (2024-11-25)
+
+### Features
+
+* Add positionId to position leg ([f082e24](https://www.github.com/SimonRiis/annoedge_domain/commit/f082e24bc3ca93693f92e42c82bfa205534d4e99))
+
 <a name="0.9.0"></a>
 ## [0.9.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.9.0) (2024-11-24)
 
