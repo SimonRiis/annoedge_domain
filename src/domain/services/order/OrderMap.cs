@@ -8,7 +8,8 @@ namespace domain.services.order
     {
         public Fin<Order> MapFrom(OrderDTO order)
         {
-            var orderAggregate = new Order(order.Product, order.Exchange, order.Id, order.Quantity, order.Price, order.Direction, order.ExchangeTimestamp, order.LastUpdated);
+            var orderAggregate = new Order(order.Product, order.Exchange, order.Id, order.ExternalId, order.Status, order.Quantity, 
+                order.Price, order.Direction, order.ExchangeTimestamp, order.LastUpdated);
 
             var tradesRes = order.Trades.Map(trade =>
             {
@@ -16,7 +17,8 @@ namespace domain.services.order
                 {
                     ExchangeTimestamp = trade.ExchangeTimestamp,
                     Id = trade.Id,
-                    OrderId = trade.OrderId,
+                    ExternalId = trade.ExternalId,
+                    ExternalOrderId = trade.ExternalOrderId,
                     Price = trade.Price,
                     Quantity = trade.Quantity,
                     TotalPriceInUSD = trade.TotalPriceInUSD,
@@ -37,7 +39,8 @@ namespace domain.services.order
                 {
                     ExchangeTimestamp = fill.ExchangeTimestamp,
                     Id = fill.Id,
-                    OrderId = fill.OrderId,
+                    ExternalId = fill.ExternalId,
+                    ExternalOrderId = fill.ExternalOrderId,
                     Price = fill.Price,
                     Quantity = fill.Quantity,
                     Direction = fill.Direction,

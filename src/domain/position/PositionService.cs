@@ -98,7 +98,7 @@ namespace domain.position
             return results.FlattenResult();
         }
 
-        public async Task<Fin<Position>> GetPositionForOrderIdAsync(Guid orderId)
+        public async Task<Fin<Position>> GetPositionForOrderIdAsync(string orderId)
         {
             var positionRes = await positionRepository.GetForOrderId(orderId);
             return await positionRes.Match(

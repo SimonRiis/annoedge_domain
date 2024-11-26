@@ -8,15 +8,16 @@ namespace domain.order;
 
 
 
-public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal quantity, decimal price, Direction direction, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
+public class Order(Product product, Exchange exchange, string id, string externalId, Status status, decimal quantity, decimal price, Direction direction, DateTimeOffset exchangeTimestamp, DateTimeOffset lastUpdated )
 {
     public Direction Direction { get; init; } = direction;
-    public ExchangeMapId Id { get; init; } = id;
+    public string Id { get; init; } = id;
+    public string ExternalId  { get; init; } = externalId;
     public Product Product { get; init; } = product;
     public decimal Quantity { get; init; } = quantity;
     public decimal Price { get; init; } = price;
     public Exchange Exchange { get; init; } = exchange;
-    public Status Status { get; private set; } = Status.Pending;
+    public Status Status { get; private set; } = status;
     public DateTimeOffset LastUpdated { get; private set; } = lastUpdated;
     public DateTimeOffset ExchangeTimestamp { get; init; } = exchangeTimestamp;
 
@@ -28,7 +29,7 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
 
     public Fin<Unit> AddTrade(Trade trade)
     {
-        if (trade.OrderId.InternalId != Id.InternalId)
+        if (trade.ExternalOrderId != ExternalId)
             return Error.New($"Trade with tradeId: {trade.Id} does not belong to this order.");
 
         _trades.Add(trade);
@@ -38,7 +39,7 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
 
     public Fin<Unit> AddFill(Fill fill)
     {
-        if (fill.OrderId.InternalId != Id.InternalId)
+        if (fill.ExternalOrderId != ExternalId)
             return Error.New($"Fill with fillId: {fill.Id} does not belong to this order.");
 
         _fills.Add(fill);
@@ -46,7 +47,7 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
         return FinSucc(unit);
     }
 
-    public Option<Fill> GetFillById(Guid fillId) => _fills.Find(f => f.Id.InternalId == fillId);
+    public Option<Fill> GetFillById(string fillId) => _fills.Find(f => f.Id == fillId);
 
     private Fin<Unit> UpdateFill(Fill oldFill, Fill updatedFill)
     {
@@ -57,7 +58,7 @@ public class Order(Product product, Exchange exchange, ExchangeMapId id, decimal
         return FinSucc(unit);
     }
 
-    public Fin<Unit> UpdateFillStatus(Guid fillId, FillStatus status)
+    public Fin<Unit> UpdateFillStatus(string fillId, FillStatus status)
     {
         var fill = GetFillById(fillId);
         return fill.Match(
