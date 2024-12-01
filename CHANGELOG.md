@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.13.0"></a>
+## [0.13.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.13.0) (2024-12-01)
+
+### Features
+
+* use string for ids for external data ([2b5308b](https://www.github.com/SimonRiis/annoedge_domain/commit/2b5308bea022a1cc9928b1b0481d26905b475012))
+
 <a name="0.12.0"></a>
 ## [0.12.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.12.0) (2024-12-01)
 
