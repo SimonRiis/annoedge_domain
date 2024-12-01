@@ -2,7 +2,7 @@
 
 namespace domain.order
 {
-    public interface IFillRepository : IRepository<Fill>
+    public interface IFillRepository : IExternalDataRepository<Fill>
     {
     }
 }

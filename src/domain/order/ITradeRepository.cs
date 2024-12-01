@@ -2,7 +2,7 @@
 
 namespace domain.order
 {
-    public interface ITradeRepository : IRepository<Trade>
+    public interface ITradeRepository : IExternalDataRepository<Trade>
     {
     }
 }

@@ -4,7 +4,7 @@ using LanguageExt;
 
 namespace domain.order;
 
-public interface IOrderRepository : IRepository<Order>
+public interface IOrderRepository : IExternalDataRepository<Order>
 {
     Task<Fin<IEnumerable<Order>>> GetOrdersWithUnhandledFills();
 }
