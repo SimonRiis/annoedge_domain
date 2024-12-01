@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.12.0"></a>
+## [0.12.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.12.0) (2024-12-01)
+
+### Features
+
+* Added orderex related stuff ([3eaacd8](https://www.github.com/SimonRiis/annoedge_domain/commit/3eaacd82357620f404e96af0b553beb1206b8b12))
+
 <a name="0.11.0"></a>
 ## [0.11.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.11.0) (2024-11-25)
 

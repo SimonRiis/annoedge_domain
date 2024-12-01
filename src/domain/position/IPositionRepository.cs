@@ -5,5 +5,5 @@ namespace domain.position;
 
 public interface IPositionRepository : IRepository<Position>
 {
-    Task<Option<Position>> GetForOrderId(Guid id);
+    Task<Option<Position>> GetForOrderId(string id);
 }

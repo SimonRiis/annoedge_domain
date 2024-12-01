@@ -6,7 +6,8 @@ namespace domain.services.order
     public record OrderDTO
     {
         public required Direction Direction { get; init; }
-        public required ExchangeMapId Id { get; init; }
+        public required string Id { get; init; }
+        public required string ExternalId { get; init; }
         public required Product Product { get; init; }
         public required decimal Quantity { get; init; }
         public required decimal Price { get; init; }

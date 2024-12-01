@@ -5,7 +5,7 @@ namespace domain.position
 {
     public interface IPositionService
     {
-        Task<Fin<Position>> GetPositionForOrderIdAsync(Guid orderId);
+        Task<Fin<Position>> GetPositionForOrderIdAsync(string orderId);
         Task<Fin<Unit>> UpdateAsync(Position position);
 
         Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate);

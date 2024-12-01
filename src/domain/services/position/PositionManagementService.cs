@@ -109,13 +109,13 @@ namespace domain.services.position
                                             return
                                             position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
                                            
-                                            .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                            .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
                                             .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
                                         else if (fill.Direction == Direction.SHORT)
                                         {
                                             return position.DecreaseLeg(leg.Id, fill.Quantity)
-                                                .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id.InternalId, FillStatus.FullyApplied))
+                                                .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
                                                 .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
                                         else
@@ -162,7 +162,7 @@ namespace domain.services.position
 
         private async Task<Fin<Unit>> ProcessOrder(Order order)
         {
-            var position = await positionService.GetPositionForOrderIdAsync(order.Id.InternalId);
+            var position = await positionService.GetPositionForOrderIdAsync(order.Id);
             return await position.Match(
                 Succ: async position => await ProcessPosition(position, order),
                 Fail: error => Task.FromResult(FinFail<Unit>(error))
