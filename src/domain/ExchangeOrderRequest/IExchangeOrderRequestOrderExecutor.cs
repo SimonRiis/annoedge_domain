@@ -9,6 +9,6 @@ namespace domain.ExchangeOrderRequest
 {
     public interface IExchangeOrderRequestOrderExecutor
     {
-        Task<Fin<Unit>> ExecuteAsync<T>(T orderRequest) where T : ExchangeOrderRequest;
+        Task<Fin<ExchangeOrderRequestResponse>> ExecuteAsync<T>(T orderRequest) where T : ExchangeOrderRequest;
     }
 }
