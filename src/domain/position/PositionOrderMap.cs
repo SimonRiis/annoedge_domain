@@ -8,7 +8,7 @@ namespace domain.position
 {
     public record PositionOrderMap
     {
-        public Guid PositionId { get; init; }
-        public Guid OrderId { get; init; }
+        public required Guid PositionId { get; init; }
+        public required string OrderId { get; init; }
     }
 }
