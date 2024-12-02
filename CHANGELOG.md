@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.14.0"></a>
+## [0.14.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.14.0) (2024-12-02)
+
+### Features
+
+* Added support for adding positionordermap ([3aa572e](https://www.github.com/SimonRiis/annoedge_domain/commit/3aa572e9b07907079808f46c80cc1da70a847fc6))
+
 <a name="0.13.0"></a>
 ## [0.13.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.13.0) (2024-12-01)
 
