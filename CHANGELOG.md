@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.14.1"></a>
+## [0.14.1](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.14.1) (2024-12-02)
+
+### Bug Fixes
+
+* interface ([580d206](https://www.github.com/SimonRiis/annoedge_domain/commit/580d2066dcb341f5d68bb67ba90fc0884da99009))
+
 <a name="0.14.0"></a>
 ## [0.14.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.14.0) (2024-12-02)
 
