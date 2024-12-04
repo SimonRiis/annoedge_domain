@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.15.0"></a>
+## [0.15.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.15.0) (2024-12-04)
+
+### Features
+
+* Add AddAsync for position ([cbd8584](https://www.github.com/SimonRiis/annoedge_domain/commit/cbd8584559868a6362c414d2fe3050493a31a12c))
+
 <a name="0.14.1"></a>
 ## [0.14.1](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.14.1) (2024-12-02)
 
