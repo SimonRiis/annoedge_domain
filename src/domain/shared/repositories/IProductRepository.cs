@@ -2,6 +2,6 @@
 {
     public interface IProductRepository : IRepository<Product>
     {
-        Task<Product> GetByAssetAndExchange(string asset, string exchange);
+        Task<Product> GetByAssetAndExchange(string asset, Guid exchangeId);
     }
 }
