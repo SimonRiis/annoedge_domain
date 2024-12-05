@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.17.0"></a>
+## [0.17.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.17.0) (2024-12-05)
+
+### Features
+
+* Added internal exchange id on ExchangeOrderRequest ([b2f7414](https://www.github.com/SimonRiis/annoedge_domain/commit/b2f741481ee16f54adaf4ae95809ca0fdffa351c))
+
 <a name="0.16.0"></a>
 ## [0.16.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.16.0) (2024-12-04)
 
