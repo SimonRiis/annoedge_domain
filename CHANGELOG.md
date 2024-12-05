@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.16.0"></a>
+## [0.16.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.16.0) (2024-12-04)
+
+### Features
+
+* GetByAssetAndExchange ([15a0a0d](https://www.github.com/SimonRiis/annoedge_domain/commit/15a0a0dc6695d88903dc80f816b9e8612b30bde5))
+
 <a name="0.15.0"></a>
 ## [0.15.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.15.0) (2024-12-04)
 
