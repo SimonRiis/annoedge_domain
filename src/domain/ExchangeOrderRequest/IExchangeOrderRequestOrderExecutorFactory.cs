@@ -8,6 +8,6 @@ namespace domain.ExchangeOrderRequest
 {
     public interface IExchangeOrderRequestOrderExecutorFactory
     {
-        IExchangeOrderRequestOrderExecutor Get(string exchange);
+        IExchangeOrderRequestOrderExecutor Get(Guid exchangeId);
     }
 }

@@ -11,6 +11,7 @@ namespace domain.ExchangeOrderRequest
     public record ExchangeOrderRequest
     {
         public required string OwnOrderId { get; init; }
+        public required Guid ExchangeId { get; init; }
         public required Guid PositionId { get; init; }
         public required decimal Volume { get; init; }
         public required string Asset { get; init; }
