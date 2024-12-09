@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.17.1"></a>
+## [0.17.1](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.17.1) (2024-12-05)
+
+### Bug Fixes
+
+* uups ([24cf505](https://www.github.com/SimonRiis/annoedge_domain/commit/24cf505ef205453c4abdeed2cc24a956de31831d))
+
 <a name="0.17.0"></a>
 ## [0.17.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.17.0) (2024-12-05)
 
