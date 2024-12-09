@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.19.0"></a>
+## [0.19.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.19.0) (2024-12-09)
+
+### Features
+
+* Use quotes as part of validation ([116273a](https://www.github.com/SimonRiis/annoedge_domain/commit/116273aaa1d4b74a2d50bdbe6b5501a1479cecc7))
+
 <a name="0.18.0"></a>
 ## [0.18.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.18.0) (2024-12-09)
 
