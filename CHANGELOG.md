@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.18.0"></a>
+## [0.18.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.18.0) (2024-12-09)
+
+### Features
+
+* Move order and fill status out into seperate tables and add Irepos ([6723904](https://www.github.com/SimonRiis/annoedge_domain/commit/67239041922cdbea3d41addea9880d0af5652c68))
+
 <a name="0.17.1"></a>
 ## [0.17.1](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.17.1) (2024-12-05)
 
