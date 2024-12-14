@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.20.0"></a>
+## [0.20.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.20.0) (2024-12-14)
+
+### Features
+
+* added quote and ticker repo interfaces ([de9460f](https://www.github.com/SimonRiis/annoedge_domain/commit/de9460fc8ccb22aae02dba6ebf44c54c0b50c92b))
+
 <a name="0.19.0"></a>
 ## [0.19.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.19.0) (2024-12-09)
 
