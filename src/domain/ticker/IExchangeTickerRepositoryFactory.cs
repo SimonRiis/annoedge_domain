@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LanguageExt;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,6 @@ namespace domain.ticker
 {
     public interface IExchangeTickerRepositoryFactory
     {
-        ITickerRepository Get(Guid exchangeId);
+        Fin<ITickerRepository> Get(Guid exchangeId);
     }
 }

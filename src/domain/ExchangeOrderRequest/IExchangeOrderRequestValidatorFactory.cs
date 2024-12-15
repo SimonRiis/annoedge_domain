@@ -1,4 +1,5 @@
 ﻿using domain.ExchangeOrderRequest;
+using LanguageExt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace domain.ExchangeOrderRequest
 {
     public interface IExchangeOrderRequestValidatorFactory
     {
-        IExchangeOrderRequestValidator Get(Guid exchangeId);
+        Fin<IExchangeOrderRequestValidator> Get(Guid exchangeId);
     }
 }
