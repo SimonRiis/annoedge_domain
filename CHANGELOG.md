@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.21.0"></a>
+## [0.21.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.21.0) (2024-12-15)
+
+### Features
+
+* replace Assetprice with ticker ([8ae0d4a](https://www.github.com/SimonRiis/annoedge_domain/commit/8ae0d4a6f389bb64e383a7f84cc59b23785b19f1))
+
 <a name="0.20.0"></a>
 ## [0.20.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.20.0) (2024-12-14)
 
