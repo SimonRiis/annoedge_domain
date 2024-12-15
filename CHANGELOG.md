@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.21.3"></a>
+## [0.21.3](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.21.3) (2024-12-15)
+
+### Bug Fixes
+
+* Use fin for factories ([cfd2a98](https://www.github.com/SimonRiis/annoedge_domain/commit/cfd2a98d3e6fb5c4efaad38ec65860b24734ff9a))
+
 <a name="0.21.2"></a>
 ## [0.21.2](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.21.2) (2024-12-15)
 
