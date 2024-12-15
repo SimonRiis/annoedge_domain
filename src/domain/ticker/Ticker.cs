@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using domain.shared;
 
-namespace domain.shared
+namespace domain.ticker
 {
     public record Ticker
     {
@@ -27,7 +28,7 @@ namespace domain.shared
 
     }
 
-    public record FutureTicker: Ticker
+    public record FutureTicker : Ticker
     {
         public required decimal IndexPrice { get; init; }
         public required decimal MarkPrice { get; init; }
