@@ -1,4 +1,5 @@
 ﻿using domain.order;
+using domain.shared.repositories;
 using LanguageExt;
 using LanguageExt.ClassInstances;
 using LanguageExt.Common;
@@ -8,7 +9,7 @@ using static LanguageExt.Prelude;
 namespace domain.position
 {
     public class PositionService(IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
-        IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository) : IPositionService
+        IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IProductRepository productRepository) : IPositionService
     {
         public Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate)
         {
@@ -107,7 +108,7 @@ namespace domain.position
             var positionRes = positionRepository.UpdateAsync(position);
             var positionLegsRes = UpdateLegs(position);
             var positionOrderMapsRes = UpdateOrderMaps(position);
-            var tasks= new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
+            var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
             var results = await Task.WhenAll(tasks);
 
             return results.FlattenResult();
@@ -141,7 +142,7 @@ namespace domain.position
         {
             var positionRes = await positionRepository.GetForOrderId(orderId);
             return await positionRes.Match(
-                Some: async position => { return await ProcessPosition(position);},
+                Some: async position => { return await ProcessPosition(position); },
                 None: () => Task.FromResult(FinFail<Position>($"Could not find position for order: {orderId}"))
             );
         }
@@ -161,7 +162,7 @@ namespace domain.position
         //        {
         //            var positionOrderMap = new PositionOrderMap { PositionId = positionId, OrderId = orderId };
         //            var pRes = p.AddPositionOrderMap(positionOrderMap);
-                    
+
         //            return await pRes.Match(
 
         //                Succ: async _ => { return await UpdateAsync(p); },
@@ -182,6 +183,19 @@ namespace domain.position
             );
         }
 
-      
+        public async Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositionsForSymbolAndExchange(string symbol, Guid exchangeId)
+        {
+            var mappedSymbol = await productRepository.GetByAssetAndExchange(symbol, exchangeId);
+            var product = mappedSymbol.ToFin("Product not found");
+            return await product.BindAsync(async product =>
+            {
+                var positions = await positionRepository.GetAllOpenForProductOnExchange(product, exchangeId);
+                return await positions.BindAsync(async p =>
+                {
+                    IEnumerable<Fin<Position>> positions = await Task.WhenAll(p.Select(ProcessPosition));
+                    return FinSucc(positions);
+                });
+            });
+        }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using domain.order;
+using domain.shared;
 using LanguageExt;
 
 namespace domain.position
@@ -14,5 +15,6 @@ namespace domain.position
 
         Fin<Position> CreatePosition(Guid positionId, PositionMandate positionMandate);
         Task<Fin<IEnumerable<Fin<Position>>>> GetPositions(string query);
+        Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositionsForSymbolAndExchange(string symbol, Guid exchangeId);
     }
 }
