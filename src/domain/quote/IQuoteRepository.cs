@@ -1,4 +1,5 @@
 ﻿using domain.shared;
+using LanguageExt;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace domain.quote
 {
     public interface IQuoteRepository
     {
-        Task<IEnumerable<Quote>> GetQuotesAsync(Symbol symbol, DateTimeOffset startDate, DateTimeOffset endDate);
+        Task<Fin<IEnumerable<Quote>>> GetQuotesAsync(Symbol symbol, DateTimeOffset startDate, DateTimeOffset endDate);
     }
 }
