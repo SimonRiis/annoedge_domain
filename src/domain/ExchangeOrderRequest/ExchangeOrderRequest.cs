@@ -1,4 +1,5 @@
-﻿using System;
+﻿using domain.shared.enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace domain.ExchangeOrderRequest
 {
-    public enum OrderDirection { SELL, BUY }
+    //public enum OrderDirection { SELL, BUY }
 
     public record ExchangeOrderRequest
     {
@@ -16,7 +17,7 @@ namespace domain.ExchangeOrderRequest
         public required decimal Volume { get; init; }
         public required string Asset { get; init; }
      
-        public required OrderDirection OrderDirection { get; init; }
+        public required Direction OrderDirection { get; init; }
         public override string ToString()
         {
             return $"volume {Volume} orderdirection {OrderDirection.ToString()}";
