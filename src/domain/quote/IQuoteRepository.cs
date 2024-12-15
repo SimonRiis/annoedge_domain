@@ -10,6 +10,6 @@ namespace domain.quote
 {
     public interface IQuoteRepository
     {
-        Task<IEnumerable<Quote>> GetQuotesAsync(Symbol symbol, DateTime startDate, DateTime endDate);
+        Task<IEnumerable<Quote>> GetQuotesAsync(Symbol symbol, DateTimeOffset startDate, DateTimeOffset endDate);
     }
 }

@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.21.1"></a>
+## [0.21.1](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.21.1) (2024-12-15)
+
+### Bug Fixes
+
+* datetimeoffset fopr quotes ([402edf4](https://www.github.com/SimonRiis/annoedge_domain/commit/402edf4aee9c74953407ed531f5eb728ab5d05bf))
+
 <a name="0.21.0"></a>
 ## [0.21.0](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.21.0) (2024-12-15)
 
