@@ -11,6 +11,6 @@ namespace domain.ticker
     public interface ITickerRepository
 
     {
-        Task<Option<Ticker>> GetLatestTickerAsync(Symbol symbol, DateTimeOffset dateTimeOffset);
+        Task<Option<Ticker>> GetLatestTickerAsync(Product product, DateTimeOffset dateTimeOffset);
     }
 }
