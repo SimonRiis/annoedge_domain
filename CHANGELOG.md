@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.2"></a>
+## [0.22.2](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.2) (2024-12-17)
+
+### Bug Fixes
+
+* add Ticker to order validation interface ([56d2a2c](https://www.github.com/SimonRiis/annoedge_domain/commit/56d2a2c4da34924fc41d70baca2f70d2c01a9c74))
+
 <a name="0.22.1"></a>
 ## [0.22.1](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.1) (2024-12-15)
 
