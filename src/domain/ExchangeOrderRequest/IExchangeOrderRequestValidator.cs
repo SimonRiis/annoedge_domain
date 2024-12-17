@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using domain.ticker;
+using LanguageExt;
 using Skender.Stock.Indicators;
 using System;
 using System.Collections.Generic;
@@ -10,6 +11,6 @@ namespace domain.ExchangeOrderRequest
 {
     public interface IExchangeOrderRequestValidator
     {
-        Task<Fin<Unit>> ValidateAsync<T>(T orderRequest, IEnumerable<Quote> quotes) where T : ExchangeOrderRequest;
+        Task<Fin<Unit>> ValidateAsync<T>(T orderRequest, IEnumerable<Quote> quotes, Ticker ticker) where T : ExchangeOrderRequest;
     }
 }
