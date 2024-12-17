@@ -11,6 +11,6 @@ namespace domain.quote
 {
     public interface IQuoteRepository
     {
-        Task<Fin<IEnumerable<Quote>>> GetQuotesAsync(Symbol symbol, DateTimeOffset startDate, DateTimeOffset endDate);
+        Task<Fin<IEnumerable<Quote>>> GetQuotesAsync(Product product, DateTimeOffset startDate, DateTimeOffset endDate);
     }
 }
