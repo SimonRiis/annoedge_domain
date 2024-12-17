@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 namespace domain.ticker
 {
     public interface ITickerRepository
-
     {
         Task<Option<Ticker>> GetLatestTickerAsync(Product product, DateTimeOffset dateTimeOffset);
     }
