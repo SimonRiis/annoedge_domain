@@ -10,6 +10,6 @@ namespace domain.ticker
 {
     public interface ITickerRepository
     {
-        Task<Option<Ticker>> GetLatestTickerAsync(Product product, DateTimeOffset dateTimeOffset);
+        Task<Option<T>> GetLatestTickerAsync<T>(Product product, DateTimeOffset dateTimeOffset) where T : Ticker;
     }
 }
