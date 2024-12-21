@@ -12,9 +12,6 @@ namespace domain.ticker
         public DateTimeOffset Timestamp { get; init; }
         public required Symbol Symbol { get; init; }
         public required string Exchange { get; init; }
-        public required string BaseAsset { get; init; }
-        public required string QuoteAsset { get; init; }
-
         public required decimal BestAsk { get; init; }
         public required decimal BestBid { get; init; }
         public required decimal LastPrice { get; init; }
