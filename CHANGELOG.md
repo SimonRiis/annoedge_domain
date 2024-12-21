@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.5"></a>
+## [0.22.5](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.5) (2024-12-21)
+
+### Bug Fixes
+
+* enable support for ticker subtypes ([650e655](https://www.github.com/SimonRiis/annoedge_domain/commit/650e655291a919717ef02a06b017ca9c322aedcb))
+
 <a name="0.22.4"></a>
 ## [0.22.4](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.4) (2024-12-21)
 
