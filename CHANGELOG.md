@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.6"></a>
+## [0.22.6](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.6) (2024-12-21)
+
+### Bug Fixes
+
+* make ticker repo interface generic ([062be2b](https://www.github.com/SimonRiis/annoedge_domain/commit/062be2ba40e6c459c04424bea1b7e260b945f3cd))
+
 <a name="0.22.5"></a>
 ## [0.22.5](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.5) (2024-12-21)
 
