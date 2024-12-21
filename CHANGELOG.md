@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.4"></a>
+## [0.22.4](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.4) (2024-12-21)
+
+### Bug Fixes
+
+* base and quote asset not needed on ticker ([8caa1a3](https://www.github.com/SimonRiis/annoedge_domain/commit/8caa1a34c532931a8e6baab9c0759b5b7cc988b1))
+
 <a name="0.22.3"></a>
 ## [0.22.3](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.3) (2024-12-17)
 
