@@ -5,7 +5,8 @@ namespace domain.book;
 
 public class Book(IBookEntryService bookEntryService)
 {
-    public required long Id { get; init; }
+    public required Guid Id { get; init; }
+    public required string Name { get; init; }
     private readonly List<BookEntry> _entries = [];
     public IReadOnlyCollection<BookEntry> Entries => _entries.AsReadOnly();
 

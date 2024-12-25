@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.9"></a>
+## [0.22.9](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.9) (2024-12-25)
+
+### Bug Fixes
+
+* use guid for bookId also added name ([a4e422a](https://www.github.com/SimonRiis/annoedge_domain/commit/a4e422a7388e65ad2942877343dcd97fd840bc79))
+
 <a name="0.22.8"></a>
 ## [0.22.8](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.8) (2024-12-22)
 
