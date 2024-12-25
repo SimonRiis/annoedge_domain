@@ -47,7 +47,7 @@ namespace test
                 Quantity = 100m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = Guid.Empty, Name = "" };
 
             book1.AddBookEntry(bookEntry);
 
@@ -114,12 +114,12 @@ namespace test
                 Quantity = 50m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = Guid.Empty, Name = "" };
 
             book1.AddBookEntry(bookEntry);
 
 
-            var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 1 };
+            var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = Guid.NewGuid(), Name = "" };
             book2.AddBookEntry(bookEntry2);
 
             var exchange = new Exchange { Name = "KRAKEN", Id = exchangeId, DefaultBookId = Guid.NewGuid() };
@@ -175,7 +175,7 @@ namespace test
                 Quantity = 100m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = Guid.NewGuid(), Name = "" };
 
             book1.AddBookEntry(bookEntry);
 
@@ -229,7 +229,7 @@ namespace test
                 Quantity = 100m
             };
 
-            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 0 };
+            var book1 = new Book(new BookEntryService(new PriceService(), new QuantityService())) {Id = Guid.Empty, Name = "" };
 
             book1.AddBookEntry(bookEntry);
 
@@ -242,7 +242,7 @@ namespace test
                 Quantity = 50m
             };
 
-            var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) { Id = 1 };
+            var book2 = new Book(new BookEntryService(new PriceService(), new QuantityService())) {Id = Guid.NewGuid(), Name = "" };
             book2.AddBookEntry(bookEntry2);
 
 
