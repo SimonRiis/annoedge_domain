@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.11"></a>
+## [0.22.11](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.11) (2024-12-26)
+
+### Bug Fixes
+
+* add unit of work and logger ([110fc29](https://www.github.com/SimonRiis/annoedge_domain/commit/110fc292860e8fbc97a634ea05b571ce2cea713b))
+
 <a name="0.22.10"></a>
 ## [0.22.10](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.10) (2024-12-26)
 
