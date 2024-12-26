@@ -14,7 +14,7 @@ using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionManagementService(ILogger logger, IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
+    public class PositionManagementService(ILogger<PositionManagementService> logger, IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
     {
         private Fin<Unit> ProcessBookAllocation(
         Book globalBook,
