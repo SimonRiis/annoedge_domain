@@ -5,7 +5,7 @@ using Microsoft.Extensions.Logging;
 using static LanguageExt.Prelude;
 namespace domain.position;
 
-public class PositionLegService(ILogger logger, IPriceService priceService, IQuantityService QuantityService) : IPositionLegService
+public class PositionLegService(ILogger<PositionLegService> logger, IPriceService priceService, IQuantityService QuantityService) : IPositionLegService
 {
     public Fin<PositionLeg> DecreaseQuantity(PositionLeg leg, decimal QuantityReduction)
     {
