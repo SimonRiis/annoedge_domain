@@ -8,7 +8,7 @@ using static LanguageExt.Prelude;
 
 namespace domain.position
 {
-    public class PositionService(IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
+    public class PositionService(IUnitOfWork unitOfWork, IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
         IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IProductRepository productRepository) : IPositionService
     {
         public Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate)
@@ -115,6 +115,7 @@ namespace domain.position
         }
         public async Task<Fin<Unit>> AddAsync(Position position)
         {
+            await unitOfWork.Begin();
             var positionRes = positionRepository.AddAsync(position);
             var positionLegsRes = Task.WhenAll(position.Legs.Select(positionLegRepository.AddAsync)).ContinueWith(task =>
             {
@@ -135,7 +136,16 @@ namespace domain.position
             var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
             var results = await Task.WhenAll(tasks);
 
-            return results.FlattenResult();
+            if (results.All(result => result.IsSucc))
+            {
+                await unitOfWork.Commit();
+                return FinSucc(Unit.Default);
+            }
+            else
+            {
+                await unitOfWork.Rollback();
+                return results.FlattenResult();
+            }
         }
 
         public async Task<Fin<Position>> GetPositionForOrderIdAsync(string orderId)
