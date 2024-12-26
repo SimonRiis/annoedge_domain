@@ -11,7 +11,7 @@ namespace domain.order
 {
     public interface IFillStatusRepository : IRepository<FillStatus>
     {
-        Task<Fin<Status>> GetForFillId(string fillId);
+        Task<Fin<FillStatus>> GetForFillId(string fillId);
         Task<Fin<Unit>> UpdateForFillId(string fillId, FillStatus status);
 
     }
