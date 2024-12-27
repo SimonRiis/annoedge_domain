@@ -19,8 +19,8 @@ namespace domain.position
             if (positionMandate.Id == Guid.Empty)
                 return Error.New("PositionMandate Id cannot be empty");
 
-            if (positionMandate.StoplossPct >= 0)
-                return Error.New("PositionMandate Stoploss cannot be 0 or positive");
+            if (positionMandate.StoplossPct <= 0)
+                return Error.New("PositionMandate Stoploss cannot be 0 or negative");
 
             if (positionMandate.TakeProfitPct <= 0)
                 return Error.New("PositionMandate Take profit cannot be 0 or negative");
@@ -40,8 +40,8 @@ namespace domain.position
             if (positionMandate.Id == Guid.Empty)
                 return Error.New("PositionMandate Id cannot be empty");
 
-            if (positionMandate.StoplossPct >= 0)
-                return Error.New("PositionMandate Stoploss cannot be 0 or positive");
+            if (positionMandate.StoplossPct <= 0)
+                return Error.New("PositionMandate Stoploss cannot be 0 or negative");
 
             if (positionMandate.TakeProfitPct <= 0)
                 return Error.New("PositionMandate Take profit cannot be 0 or negative");
