@@ -116,36 +116,81 @@ namespace domain.position
         public async Task<Fin<Unit>> AddAsync(Position position)
         {
             await unitOfWork.Begin();
-            var positionRes = positionRepository.AddAsync(position);
-            var positionLegsRes = Task.WhenAll(position.Legs.Select(positionLegRepository.AddAsync)).ContinueWith(task =>
-            {
-                if (task.Result.All(r => r.IsSucc))
-                    return FinSucc(Unit.Default);
-                else
-                    return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            });
 
-            var positionOrderMapsRes = Task.WhenAll(position.PositionOrderMaps.Select(positionOrderMapRepository.AddAsync)).ContinueWith(task =>
+            try
             {
-                if (task.Result.All(r => r.IsSucc))
-                    return FinSucc(Unit.Default);
-                else
-                    return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            });
+                // Add the position
+                var positionRes = await positionRepository.AddAsync(position);
+                if (positionRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return positionRes;
+                }
 
-            var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
-            var results = await Task.WhenAll(tasks);
+                // Add position legs sequentially
+                foreach (var leg in position.Legs)
+                {
+                    var legRes = await positionLegRepository.AddAsync(leg);
+                    if (legRes.IsFail)
+                    {
+                        await unitOfWork.Rollback();
+                        return legRes;
+                    }
+                }
 
-            if (results.All(result => result.IsSucc))
-            {
+                // Add position order maps sequentially
+                foreach (var orderMap in position.PositionOrderMaps)
+                {
+                    var mapRes = await positionOrderMapRepository.AddAsync(orderMap);
+                    if (mapRes.IsFail)
+                    {
+                        await unitOfWork.Rollback();
+                        return mapRes;
+                    }
+                }
+
+                // Commit transaction if all operations succeed
                 await unitOfWork.Commit();
                 return FinSucc(Unit.Default);
             }
-            else
+            catch (Exception ex)
             {
                 await unitOfWork.Rollback();
-                return results.FlattenResult();
+                return FinFail<Unit>($"Unexpected error: {ex.Message}");
             }
+
+
+            //await unitOfWork.Begin();
+            //var positionRes = positionRepository.AddAsync(position);
+            //var positionLegsRes = Task.WhenAll(position.Legs.Select(positionLegRepository.AddAsync)).ContinueWith(task =>
+            //{
+            //    if (task.Result.All(r => r.IsSucc))
+            //        return FinSucc(Unit.Default);
+            //    else
+            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
+            //});
+
+            //var positionOrderMapsRes = Task.WhenAll(position.PositionOrderMaps.Select(positionOrderMapRepository.AddAsync)).ContinueWith(task =>
+            //{
+            //    if (task.Result.All(r => r.IsSucc))
+            //        return FinSucc(Unit.Default);
+            //    else
+            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
+            //});
+
+            //var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
+            //var results = await Task.WhenAll(tasks);
+
+            //if (results.All(result => result.IsSucc))
+            //{
+            //    await unitOfWork.Commit();
+            //    return FinSucc(Unit.Default);
+            //}
+            //else
+            //{
+            //    await unitOfWork.Rollback();
+            //    return results.FlattenResult();
+            //}
         }
 
         public async Task<Fin<Position>> GetPositionForOrderIdAsync(string orderId)
