@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.18"></a>
+## [0.22.18](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.18) (2024-12-31)
+
+### Bug Fixes
+
+* use order id (generated) for foregin keys for fill and trade ([bc71f0a](https://www.github.com/SimonRiis/annoedge_domain/commit/bc71f0a0fc90405fdd9f45d1ce974381b87c98a8))
+
 <a name="0.22.17"></a>
 ## [0.22.17](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.17) (2024-12-31)
 
