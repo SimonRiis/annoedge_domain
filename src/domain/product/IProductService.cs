@@ -1,4 +1,5 @@
 ﻿using domain.exchange;
+using LanguageExt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace domain.product
 {
     public interface IProductService
     {
-        Task<string> GetExchangeSymbolForProduct(Product product, Exchange exchange);
+        Task<Fin<string>> GetExchangeSymbolForProduct(Product product, Exchange exchange);
     }
 }
