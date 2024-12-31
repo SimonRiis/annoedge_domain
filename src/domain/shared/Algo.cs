@@ -1,4 +1,5 @@
 using System;
+using domain.exchange;
 
 namespace domain.shared;
 

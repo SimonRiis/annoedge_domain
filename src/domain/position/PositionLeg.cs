@@ -1,5 +1,5 @@
+using domain.exchange;
 using domain.product;
-using domain.shared;
 using domain.shared.enums;
 using LanguageExt;
 using LanguageExt.Common;
