@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.16"></a>
+## [0.22.16](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.16) (2024-12-31)
+
+### Bug Fixes
+
+* added product service ([97795ae](https://www.github.com/SimonRiis/annoedge_domain/commit/97795aeca38e1dbe4c36cdbaf24052011be1a274))
+* moved exchange to own folder ([02300c8](https://www.github.com/SimonRiis/annoedge_domain/commit/02300c8d8a590bf80bbe3d718b1a4764d013083a))
+
 <a name="0.22.15"></a>
 ## [0.22.15](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.15) (2024-12-31)
 
