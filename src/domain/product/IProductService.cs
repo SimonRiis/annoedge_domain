@@ -1,4 +1,4 @@
-﻿using domain.shared;
+﻿using domain.exchange;
 using System;
 using System.Collections.Generic;
 using System.Linq;

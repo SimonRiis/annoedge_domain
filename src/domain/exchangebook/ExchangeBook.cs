@@ -1,6 +1,6 @@
 using System;
 using domain.book;
-using domain.shared;
+using domain.exchange;
 
 namespace domain.exchangebook;
 
