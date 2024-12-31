@@ -1,5 +1,5 @@
 using System;
-using domain.shared;
+using domain.product;
 
 namespace domain.book;
 

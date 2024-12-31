@@ -1,4 +1,4 @@
-﻿using domain.shared;
+﻿using domain.product;
 using LanguageExt;
 using Skender.Stock.Indicators;
 using System;

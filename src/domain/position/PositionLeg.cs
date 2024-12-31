@@ -1,3 +1,4 @@
+using domain.product;
 using domain.shared;
 using domain.shared.enums;
 using LanguageExt;

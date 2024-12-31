@@ -1,4 +1,5 @@
-﻿using domain.shared;
+﻿using domain.product;
+using domain.shared;
 using domain.shared.enums;
 
 namespace domain.services.order

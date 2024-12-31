@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.15"></a>
+## [0.22.15](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.15) (2024-12-31)
+
+### Bug Fixes
+
+* added IProductService ([e84ef5d](https://www.github.com/SimonRiis/annoedge_domain/commit/e84ef5dd3769cef16902031bd70e2a2ffa5d762a))
+
 <a name="0.22.14"></a>
 ## [0.22.14](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.14) (2024-12-27)
 
