@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.17"></a>
+## [0.22.17](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.17) (2024-12-31)
+
+### Bug Fixes
+
+* use UOW in order insert ([ca1f310](https://www.github.com/SimonRiis/annoedge_domain/commit/ca1f3108fa2b18a4f7b8b79936c49e6499bd7aa6))
+
 <a name="0.22.16"></a>
 ## [0.22.16](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.16) (2024-12-31)
 
