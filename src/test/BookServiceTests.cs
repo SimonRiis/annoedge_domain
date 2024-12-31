@@ -10,6 +10,7 @@ using static LanguageExt.Prelude;
 using domain.book;
 using domain.shared;
 using BookService = domain.services.book.BookService;
+using domain.product;
 
 namespace test
 {
