@@ -30,7 +30,7 @@ public class Order(Product product, Exchange exchange, string id, string externa
 
     public Fin<Unit> AddTrade(Trade trade)
     {
-        if (trade.ExternalOrderId != ExternalId)
+        if (trade.OrderId != Id)
             return Error.New($"Trade with tradeId: {trade.Id} does not belong to this order.");
 
         _trades.Add(trade);
@@ -40,7 +40,7 @@ public class Order(Product product, Exchange exchange, string id, string externa
 
     public Fin<Unit> AddFill(Fill fill)
     {
-        if (fill.ExternalOrderId != ExternalId)
+        if (fill.OrderId != Id)
             return Error.New($"Fill with fillId: {fill.Id} does not belong to this order.");
 
         _fills.Add(fill);
