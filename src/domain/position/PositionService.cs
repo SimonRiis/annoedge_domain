@@ -1,4 +1,5 @@
 ﻿using domain.order;
+using domain.product;
 using domain.shared.repositories;
 using LanguageExt;
 using LanguageExt.ClassInstances;

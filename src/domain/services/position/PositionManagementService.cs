@@ -4,7 +4,7 @@ using domain.book;
 using domain.exchangebook;
 using domain.order;
 using domain.position;
-using domain.shared;
+using domain.product;
 using domain.shared.enums;
 using domain.shared.repositories;
 using LanguageExt;

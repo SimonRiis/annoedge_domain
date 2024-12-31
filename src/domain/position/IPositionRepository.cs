@@ -1,4 +1,4 @@
-using domain.shared;
+using domain.product;
 using domain.shared.repositories;
 using LanguageExt;
 
