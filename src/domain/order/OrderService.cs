@@ -82,7 +82,7 @@ namespace domain.order
                     return orderRes;
                 }
 
-                var orderStatusRes = await orderStatusRepository.UpdateForOrderId(order.Id, order.Status);
+                var orderStatusRes = await orderStatusRepository.InitOrderStatus(order.Id);
 
                 if (orderStatusRes.IsFail)
                 {
@@ -100,7 +100,7 @@ namespace domain.order
                         return fillRes;
                     }
 
-                    var fillStatusRes = await fillStatusRepository.UpdateForFillId(fill.Id, fill.Status);
+                    var fillStatusRes = await fillStatusRepository.InitFillStatus(fill.Id);
 
                     if (fillStatusRes.IsFail)
                     {
