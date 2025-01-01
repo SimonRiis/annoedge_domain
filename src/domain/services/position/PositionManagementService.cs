@@ -105,17 +105,17 @@ namespace domain.services.position
                                             );
                                         }
 
-                                        if (fill.Direction == Direction.LONG)
+                                        if (fill.Direction == leg.Direction && fill.Status != FillStatus.FullyApplied) //opening or increasing position
                                         {
                                             return
-                                            position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
+                                            position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price) //if long increase long if short increase short
 
                                             .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
                                             .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
-                                        else if (fill.Direction == Direction.SHORT)
+                                        else if (fill.Direction != leg.Direction && fill.Status != FillStatus.FullyApplied) //closing or decreasing position
                                         {
-                                            return position.DecreaseLeg(leg.Id, fill.Quantity)
+                                            return position.DecreaseLeg(leg.Id, fill.Quantity) //if the fill is in the opposite direction we need to decrease the leg to support closing long or short positions
                                                 .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
                                                 .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
