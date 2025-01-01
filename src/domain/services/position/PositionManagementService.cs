@@ -189,7 +189,7 @@ namespace domain.services.position
                                 return order.AddFill(fill);
                             });
 
-                            if (res.ToArray().FlattenResult())
+                            if (res.ToArray().FlattenResult().IsFail)
                             {
                                 return FinFail<Unit>($"Failed to add fills to order {order.Id}");
                             }
