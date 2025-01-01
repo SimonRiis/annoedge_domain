@@ -70,5 +70,15 @@ namespace domain.book
             return FinSucc(Unit.Default);
 
         }
+
+        public async Task<Fin<Unit>> AddBookEntryIfNotExists(BookEntry bookEntry)
+        {
+            var bookEntryRes = await bookEntryRepository.GetForProductId(bookEntry.Product);
+
+            if(bookEntryRes.IsSome)
+                return FinSucc(Unit.Default); // Book entry already exists
+
+            return await bookEntryRepository.AddAsync(bookEntry);
+        }
     }
 }

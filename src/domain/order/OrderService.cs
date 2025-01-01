@@ -1,10 +1,11 @@
-﻿using domain.shared.repositories;
+﻿using domain.book;
+using domain.shared.repositories;
 using LanguageExt;
 using static LanguageExt.Prelude;
 
 namespace domain.order
 {
-    public class OrderService(IUnitOfWork unitOfWork, IOrderRepository orderRepository, IOrderStatusRepository orderStatusRepository, IFillStatusRepository fillStatusRepository, IFillRepository fillRepository, ITradeRepository tradeRepository) : IOrderService
+    public class OrderService(IUnitOfWork unitOfWork, IOrderRepository orderRepository, IOrderStatusRepository orderStatusRepository, IFillStatusRepository fillStatusRepository, IFillRepository fillRepository, ITradeRepository tradeRepository, IBookService bookService) : IOrderService
     {
         public Task<Fin<IEnumerable<Order>>> GetOrdersWithUnhandledFills()
         {
@@ -88,6 +89,24 @@ namespace domain.order
                 {
                     await unitOfWork.Rollback();
                     return orderStatusRes;
+                }
+
+                var bookEntry = new BookEntry
+                {
+                    Id = Guid.NewGuid(),
+                    Product = order.Product,
+                    AverageEntryPrice = 0m,
+                    LastUpdated = DateTimeOffset.UtcNow,
+                    Quantity = 0m
+                };
+
+                //if bookentry for product does not exist, add it
+                var bookEntryRes = await bookService.AddBookEntryIfNotExists(bookEntry);
+
+                if (bookEntryRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return bookEntryRes;
                 }
 
                 foreach (var fill in order.Fills)
