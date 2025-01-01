@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.19"></a>
+## [0.22.19](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.19) (2025-01-01)
+
+### Bug Fixes
+
+* hopefully enable nuget debug ([04b3709](https://www.github.com/SimonRiis/annoedge_domain/commit/04b3709a6669b3fad152b3cdaace0685c1ecd737))
+
 <a name="0.22.18"></a>
 ## [0.22.18](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.18) (2024-12-31)
 
