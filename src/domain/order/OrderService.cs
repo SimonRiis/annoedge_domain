@@ -13,10 +13,10 @@ namespace domain.order
 
         private async Task<Fin<Unit>> UpdateFill(Fill fill)
         {
-            var fillRes = await fillRepository.UpdateAsync(fill);
+            //var fillRes = await fillRepository.UpdateAsync(fill); // This is not needed as we are not updating the fill itself TODO clean up
 
-            if (fillRes.IsFail)
-                return fillRes;
+            //if (fillRes.IsFail)
+            //    return fillRes;
 
             var fillStatusRes = await fillStatusRepository.UpdateForFillId(fill.Id, fill.Status);
 
