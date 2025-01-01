@@ -12,5 +12,7 @@ namespace domain.book
     {
         public Task<Option<Book>> GetForId(Guid id);
         public Task<Fin<Unit>> UpdateAsync(Book book);
+
+        public Task<Fin<Unit>> AddBookEntryIfNotExists(BookEntry bookEntry);
     }
 }
