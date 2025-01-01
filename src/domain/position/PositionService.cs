@@ -82,37 +82,61 @@ namespace domain.position
             ));
         }
 
-        private Task<Fin<Unit>> UpdateLegs(Position position)
+        private async Task<Fin<Unit>> UpdateLegs(Position position)
         {
-            return Task.WhenAll(position.Legs.Select(positionLegRepository.UpdateAsync)).ContinueWith(task =>
+
+            foreach(var leg in position.Legs)
             {
-                if (task.Result.All(r => r.IsSucc))
-                    return FinSucc(Unit.Default);
-                else
-                    return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            });
+                var res = await positionLegRepository.UpdateAsync(leg);
+                if (res.IsFail)
+                    return res;
+            }
+            return FinSucc(Unit.Default);
         }
 
-        private Task<Fin<Unit>> UpdateOrderMaps(Position position)
+        private async Task<Fin<Unit>> UpdateOrderMaps(Position position)
         {
-            return Task.WhenAll(position.PositionOrderMaps.Select(positionOrderMapRepository.UpdateAsync)).ContinueWith(task =>
+
+            foreach (var orderMap in position.PositionOrderMaps)
             {
-                if (task.Result.All(r => r.IsSucc))
-                    return FinSucc(Unit.Default);
-                else
-                    return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            });
+                var res = await positionOrderMapRepository.UpdateAsync(orderMap);
+                if (res.IsFail)
+                    return res;
+            }
+            return FinSucc(Unit.Default);
+
+            //return Task.WhenAll(position.PositionOrderMaps.Select(positionOrderMapRepository.UpdateAsync)).ContinueWith(task =>
+            //{
+            //    if (task.Result.All(r => r.IsSucc))
+            //        return FinSucc(Unit.Default);
+            //    else
+            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
+            //});
         }
 
         public async Task<Fin<Unit>> UpdateAsync(Position position)
         {
-            var positionRes = positionRepository.UpdateAsync(position);
-            var positionLegsRes = UpdateLegs(position);
-            var positionOrderMapsRes = UpdateOrderMaps(position);
-            var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
-            var results = await Task.WhenAll(tasks);
+            var positionRes = await positionRepository.UpdateAsync(position);
 
-            return results.FlattenResult();
+            if(positionRes.IsFail)
+                return positionRes;
+
+            var positionLegsRes = await UpdateLegs(position);
+
+            if (positionLegsRes.IsFail)
+                return positionLegsRes;
+
+            var positionOrderMapsRes = await UpdateOrderMaps(position);
+
+            if (positionOrderMapsRes.IsFail)
+                return positionOrderMapsRes;
+
+            return FinSucc(Unit.Default);
+
+            //var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
+            //var results = await Task.WhenAll(tasks);
+
+            //return results.FlattenResult();
         }
         public async Task<Fin<Unit>> AddAsync(Position position)
         {
