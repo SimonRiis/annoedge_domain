@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.27"></a>
+## [0.22.27](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.27) (2025-01-01)
+
+### Bug Fixes
+
+* short position equals negative qty ([ff2bdd0](https://www.github.com/SimonRiis/annoedge_domain/commit/ff2bdd0065a4ed2ce79b40052e804630f9e16f00))
+
 <a name="0.22.26"></a>
 ## [0.22.26](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.26) (2025-01-01)
 
