@@ -8,5 +8,6 @@ namespace domain.order
     {
         Task<Fin<Status>> GetForOrderId(string orderId);
         Task<Fin<Unit>> UpdateForOrderId(string orderId, Status status);
+        Task<Fin<Unit>> InitOrderStatus(string orderId);
     }
 }

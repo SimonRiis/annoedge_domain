@@ -13,6 +13,7 @@ namespace domain.order
     {
         Task<Fin<FillStatus>> GetForFillId(string fillId);
         Task<Fin<Unit>> UpdateForFillId(string fillId, FillStatus status);
+        Task<Fin<Unit>> InitFillStatus(string fillId);
 
     }
 }
