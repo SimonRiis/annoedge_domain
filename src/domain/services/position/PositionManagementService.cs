@@ -162,7 +162,7 @@ namespace domain.services.position
 
         private async Task<Fin<Unit>> ProcessOrder(Order order)
         {
-            var position = await positionService.GetPositionForOrderIdAsync(order.Id);
+            var position = await positionService.GetPositionForOrderIdAsync(order.ExternalId); //order and position is mapped using the orders external id (external id is the id from the exchange)
             return await position.Match(
                 Succ: async position => await ProcessPosition(position, order),
                 Fail: error => Task.FromResult(FinFail<Unit>(error))
