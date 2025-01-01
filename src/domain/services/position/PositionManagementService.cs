@@ -10,11 +10,12 @@ using domain.shared.repositories;
 using LanguageExt;
 using LanguageExt.Common;
 using Microsoft.Extensions.Logging;
+using System.Runtime.InteropServices;
 using static LanguageExt.Prelude;
 
 namespace domain.services.position
 {
-    public class PositionManagementService(ILogger<PositionManagementService> logger, IOrderService orderService, IPositionService positionService, IBookService bookService, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
+    public class PositionManagementService(ILogger<PositionManagementService> logger, IOrderService orderService, IPositionService positionService, IBookService bookService, IFillRepository fillRepository, IUnitOfWork unitOfWork, Guid globalBookId) : IPositionManagementService
     {
         private Fin<Unit> ProcessBookAllocation(
         Book globalBook,
@@ -32,7 +33,7 @@ namespace domain.services.position
                 Func<Book, BookEntry, Fin<Unit>> updateAction = direction == Direction.LONG
                     ? (book, entry) => book.IncreaseBookEntryQuantity(entry.Id, volume, price)
                     : (book, entry) => book.DecreaseBookEntryQuantity(entry.Id, volume);
-                
+
                 var globalBookUpdateRes = UpdateBook(globalBook, "exchange", updateAction);
                 var exchangeBookUpdateRes = UpdateBook(exchangeBook, "exchange", updateAction);
                 var legBookUpdateRes = UpdateBook(legBook, "leg", updateAction);
@@ -87,12 +88,12 @@ namespace domain.services.position
                                     var results = fillsForPosition.Select(fill =>
                                     {
 
-                                        if(fill.Direction == leg.Direction)
+                                        if (fill.Direction == leg.Direction)
                                         {
                                             //same direction as leg, meaning we are adding to the position update intents
                                             var _ = position.DecreasePositionLegIntent(leg, fill.Quantity).Bind<Fin<Unit>>(qty =>
                                             {
-                                                if(qty < 0)
+                                                if (qty < 0)
                                                 {
                                                     //When adding support for intent based qty match for positions, the excess qty returned should be matched to the next position. 
                                                     //Basically we need to loop over the fills and match them to the intents in the right order. 
@@ -108,7 +109,7 @@ namespace domain.services.position
                                         {
                                             return
                                             position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price)
-                                           
+
                                             .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
                                             .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
@@ -179,11 +180,26 @@ namespace domain.services.position
                 {
                     foreach (var order in orders.OrderBy(o => o.ExchangeTimestamp))
                     {
-                        var result = await ProcessOrder(order);
+                        var fills = await fillRepository.GetFillsForOrderId(order.Id);
 
-                        if (result.IsFail)
+                        var res = await fills.BindAsync(async fills =>
                         {
-                            return FinFail<Unit>($"Failed to process order {order.Id}");
+                            var res = fills.Map(fill =>
+                            {
+                                return order.AddFill(fill);
+                            });
+
+                            if (res.ToArray().FlattenResult())
+                            {
+                                return FinFail<Unit>($"Failed to add fills to order {order.Id}");
+                            }
+
+                            return await ProcessOrder(order);
+                        });
+
+                        if (res.IsFail)
+                        {
+                            return FinFail<Unit>($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
                         }
                     }
 
