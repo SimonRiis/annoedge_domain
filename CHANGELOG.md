@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.20"></a>
+## [0.22.20](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.20) (2025-01-01)
+
+### Bug Fixes
+
+* get position using position_order_map table with externalId ([8fafc36](https://www.github.com/SimonRiis/annoedge_domain/commit/8fafc362ba0c423cdc42b4c5ee47b95df2a0f5b4))
+
 <a name="0.22.19"></a>
 ## [0.22.19](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.19) (2025-01-01)
 
