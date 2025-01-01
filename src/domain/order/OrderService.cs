@@ -11,37 +11,62 @@ namespace domain.order
             return orderRepository.GetOrdersWithUnhandledFills();
         }
 
-        private Task<Fin<Unit>> UpdateFill(Fill fill)
+        private async Task<Fin<Unit>> UpdateFill(Fill fill)
         {
-            var fillRes = fillRepository.UpdateAsync(fill);
-            var fillStatusRes = fillStatusRepository.UpdateForFillId(fill.Id, fill.Status);
-            var tasks = new List<Task<Fin<Unit>>> { fillRes, fillStatusRes };
-            return Task.WhenAll(tasks).ContinueWith(task =>
-            {
-                return task.Result.FlattenResult();
-            });
+            var fillRes = await fillRepository.UpdateAsync(fill);
+
+            if (fillRes.IsFail)
+                return fillRes;
+
+            var fillStatusRes = await fillStatusRepository.UpdateForFillId(fill.Id, fill.Status);
+
+            if (fillStatusRes.IsFail)
+                return fillStatusRes;
+
+            return FinSucc(Unit.Default);
         }
 
-        private Task<Fin<Unit>> UpdateFills(Order order)
+        private async Task<Fin<Unit>> UpdateFills(Order order)
         {
-            return Task.WhenAll(order.Fills.Select(UpdateFill)).ContinueWith(task =>
+
+            foreach(var fill in order.Fills)
             {
-                if (task.Result.All(r => r.IsSucc))
-                    return FinSucc(Unit.Default);
-                else
-                    return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            });
+                var fillRes = await UpdateFill(fill);
+                if (fillRes.IsFail)
+                    return fillRes;
+            }
+
+            return FinSucc(Unit.Default);
+
+            //return Task.WhenAll(order.Fills.Select(UpdateFill)).ContinueWith(task =>
+            //{
+            //    if (task.Result.All(r => r.IsSucc))
+            //        return FinSucc(Unit.Default);
+            //    else
+            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
+            //});
         }
 
         public async Task<Fin<Unit>> UpdateAsync(Order order)
         {
-            var orderRes = orderRepository.UpdateAsync(order);
-            var orderStatusRes = orderStatusRepository.UpdateForOrderId(order.Id, order.Status);
-            var fillsRes = UpdateFills(order);
-            var tasks = new List<Task<Fin<Unit>>> { orderRes, orderStatusRes, fillsRes };
-            var results = await Task.WhenAll(tasks);
+            var orderRes = await orderRepository.UpdateAsync(order);
 
-            return results.FlattenResult();
+            if (orderRes.IsFail)
+                return orderRes;
+
+            var orderStatusRes = await orderStatusRepository.UpdateForOrderId(order.Id, order.Status);
+
+            if (orderStatusRes.IsFail)
+                return orderStatusRes;
+
+            var fillsRes = await UpdateFills(order);
+
+            if (fillsRes.IsFail)
+                return fillsRes;
+
+            return FinSucc(Unit.Default);
+
+
         }
 
         public async Task<Fin<Unit>> AddAsync(Order order)

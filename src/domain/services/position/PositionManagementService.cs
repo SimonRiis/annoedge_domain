@@ -133,24 +133,59 @@ namespace domain.services.position
                                     //update position status
                                     var _ = position.UpdateStatusBasedOnIntents();
 
-                                    await unitOfWork.Begin();
-                                    var positionRes = positionService.UpdateAsync(position);
-                                    var orderRes = orderService.UpdateAsync(order);
-                                    var globalBookUpdateRes = bookService.UpdateAsync(globalBook);
-                                    var legBookUpdateRes = bookService.UpdateAsync(legBook);
-                                    var exchangeBookUpdateRes = bookService.UpdateAsync(exchangeBook);
-                                    var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes, globalBookUpdateRes, legBookUpdateRes, exchangeBookUpdateRes };
-                                    var res = await Task.WhenAll(taskList);
-
-                                    if (res.All(result => result.IsSucc))
+                                    try
                                     {
+                                        await unitOfWork.Begin();
+                                        var positionRes = await positionService.UpdateAsync(position);
+
+                                        if (positionRes.IsFail)
+                                        {
+                                            await unitOfWork.Rollback();
+                                            return positionRes;
+                                        }
+
+                                        var orderRes = await orderService.UpdateAsync(order);
+
+                                        if (orderRes.IsFail)
+                                        {
+                                            await unitOfWork.Rollback();
+                                            return orderRes;
+                                        }
+
+                                        var globalBookUpdateRes = await bookService.UpdateAsync(globalBook);
+
+                                        if (globalBookUpdateRes.IsFail)
+                                        {
+                                            await unitOfWork.Rollback();
+                                            return globalBookUpdateRes;
+                                        }
+
+                                        var legBookUpdateRes = await bookService.UpdateAsync(legBook);
+
+                                        if (legBookUpdateRes.IsFail)
+                                        {
+                                            await unitOfWork.Rollback();
+                                            return legBookUpdateRes;
+                                        }
+
+                                        var exchangeBookUpdateRes = await bookService.UpdateAsync(exchangeBook);
+
+                                        if (exchangeBookUpdateRes.IsFail)
+                                        {
+                                            await unitOfWork.Rollback();
+                                            return exchangeBookUpdateRes;
+                                        }
+
+                                        //var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes, globalBookUpdateRes, legBookUpdateRes, exchangeBookUpdateRes };
+                                        //var res = await Task.WhenAll(taskList);
+
                                         await unitOfWork.Commit();
                                         return FinSucc(Unit.Default);
                                     }
-                                    else
+                                    catch (Exception ex)
                                     {
                                         await unitOfWork.Rollback();
-                                        return FinFail<Unit>(string.Join(", ", res.Fails().Select(r => r.Message)));
+                                        return FinFail<Unit>(ex.Message);
                                     }
                                 },
                                 None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
