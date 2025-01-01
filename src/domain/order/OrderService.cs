@@ -49,10 +49,10 @@ namespace domain.order
 
         public async Task<Fin<Unit>> UpdateAsync(Order order)
         {
-            var orderRes = await orderRepository.UpdateAsync(order);
+            //var orderRes = await orderRepository.UpdateAsync(order); // This is not needed as we are not updating the order itself TODO clean up
 
-            if (orderRes.IsFail)
-                return orderRes;
+            //if (orderRes.IsFail)
+            //    return orderRes;
 
             var orderStatusRes = await orderStatusRepository.UpdateForOrderId(order.Id, order.Status);
 
