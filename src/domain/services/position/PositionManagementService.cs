@@ -232,10 +232,10 @@ namespace domain.services.position
                             return await ProcessOrder(order);
                         });
 
-                        //if (res.IsFail)
-                        //{
-                        //    return FinFail<Unit>($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
-                        //} // TODO: Should we continue with the next order or stop? For now we continue with the next order
+                        if (res.IsFail)
+                        {
+                            logger.LogError($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
+                        } // TODO: Should we continue with the next order or stop? For now we continue with the next order
                     }
 
                     return FinSucc(Unit.Default);
