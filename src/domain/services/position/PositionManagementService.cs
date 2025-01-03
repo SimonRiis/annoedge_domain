@@ -176,9 +176,6 @@ namespace domain.services.position
                                             return exchangeBookUpdateRes;
                                         }
 
-                                        //var taskList = new List<Task<Fin<Unit>>> { positionRes, orderRes, globalBookUpdateRes, legBookUpdateRes, exchangeBookUpdateRes };
-                                        //var res = await Task.WhenAll(taskList);
-
                                         await unitOfWork.Commit();
                                         return FinSucc(Unit.Default);
                                     }
@@ -204,6 +201,14 @@ namespace domain.services.position
                 Fail: error => Task.FromResult(FinFail<Unit>(error))
             );
         }
+
+        //    //TODO: When supporting limit orders we need to loop over fills and get the order for the fill
+        //    //This is due to the fact that we need to allocate the books in the right order. 
+        //    //However book allocation might be splitted out into a different service.
+        //    //Get grouped positions for the orders
+        //    //Note that a position can be for multiple orders, but one order can only have one position
+        //    //That will change when intent based volume mapping is added
+        //    //But that means that we now can loop over the orders, and apply all the fills for that order to the position
 
         public async Task<Fin<Unit>> UpdatePositions()
         {
@@ -243,40 +248,6 @@ namespace domain.services.position
                 error => Task.FromResult(FinFail<Unit>(error))
             );
         }
-
-        //public async Task<Fin<Unit>> UpdatePositions()
-        //{
-        //    // Get all orders with unhandled fills
-
-        //    //TODO: When supporting limit orders we need to loop over fills and get the order for the fill
-        //    //This is due to the fact that we need to allocate the books in the right order. 
-        //    //However book allocation might be splitted out into a different service.
-
-        //    var orders = await orderService.GetOrdersWithUnhandledFills();
-
-        //    // Get all positions for the orders
-
-        //    //    var orderIds = orders.OrderBy(x => x.ExchangeTimestamp).Select(o => o.Id.InternalId).ToList();
-
-        //    //Get grouped positions for the orders
-        //    //Note that a position can be for multiple orders, but one order can only have one position
-        //    //That will change when intent based volume mapping is added
-        //    //But that means that we now can loop over the orders, and apply all the fills for that order to the position
-
-        //    // Process each order asynchronously
-        //    return await orders.Match(
-        //        async orders =>
-        //        {
-        //            var tasks = orders.Select(async order => await ProcessOrder(order));
-
-        //            var results = await Task.WhenAll(tasks);
-
-        //            return results.FlattenResult();
-        //        },
-        //        error => Task.FromResult(FinFail<Unit>(error))
-        //    );
-
-        //}
     }
 }
 

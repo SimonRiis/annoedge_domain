@@ -46,13 +46,6 @@ namespace domain.book
 
             return FinSucc(Unit.Default);
 
-            //return Task.WhenAll(book.Entries.Select(bookEntryRepository.UpdateAsync)).ContinueWith(task =>
-            //{
-            //    if (task.Result.All(r => r.IsSucc))
-            //        return FinSucc(Unit.Default);
-            //    else
-            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            //});
         }
 
         public async Task<Fin<Unit>> UpdateAsync(Book book)

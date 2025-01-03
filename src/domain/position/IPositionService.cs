@@ -14,7 +14,6 @@ namespace domain.position
         Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate);
 
         Fin<Position> CreatePosition(Guid positionId, PositionMandate positionMandate);
-        Task<Fin<IEnumerable<Fin<Position>>>> GetPositions(string query);
         Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositions();
         Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositionsForSymbolAndExchange(string symbol, Guid exchangeId);
     }

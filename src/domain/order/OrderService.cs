@@ -39,13 +39,6 @@ namespace domain.order
 
             return FinSucc(Unit.Default);
 
-            //return Task.WhenAll(order.Fills.Select(UpdateFill)).ContinueWith(task =>
-            //{
-            //    if (task.Result.All(r => r.IsSucc))
-            //        return FinSucc(Unit.Default);
-            //    else
-            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            //});
         }
 
         public async Task<Fin<Unit>> UpdateAsync(Order order)
@@ -150,26 +143,6 @@ namespace domain.order
                 return FinFail<Unit>(ex.Message);
             }
 
-            ////var fillsRes = Task.WhenAll(order.Fills.Select(fillRepository.AddAsync)).ContinueWith(task =>
-            ////{
-            ////    if (task.Result.All(r => r.IsSucc))
-            ////        return FinSucc(Unit.Default);
-            ////    else
-            ////        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            ////});
-            //var tradesRes = Task.WhenAll(order.Trades.Select(tradeRepository.AddAsync)).ContinueWith(task =>
-            //{
-            //    if (task.Result.All(r => r.IsSucc))
-            //        return FinSucc(Unit.Default);
-            //    else
-            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            //});
-
-            //var tasks = new List<Task<Fin<Unit>>> { orderRes, fillsRes, tradesRes };
-            //return Task.WhenAll(tasks).ContinueWith(task =>
-            //{
-            //    return task.Result.FlattenResult();
-            //});
         }
     }
 }
