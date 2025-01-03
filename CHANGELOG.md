@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.31"></a>
+## [0.22.31](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.31) (2025-01-03)
+
+### Bug Fixes
+
+* Added TradePrecision ([1d2d8c6](https://www.github.com/SimonRiis/annoedge_domain/commit/1d2d8c683491807b845431f94a2f4f890d7257c1))
+
 <a name="0.22.30"></a>
 ## [0.22.30](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.30) (2025-01-03)
 
