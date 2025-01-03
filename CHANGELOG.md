@@ -2,6 +2,20 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.33"></a>
+## [0.22.33](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.33) (2025-01-03)
+
+### Bug Fixes
+
+* log if not handled ([304a488](https://www.github.com/SimonRiis/annoedge_domain/commit/304a4886020b46f8c9b8594a35a37e9d5d9ba576))
+
+<a name="0.22.32"></a>
+## [0.22.32](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.32) (2025-01-03)
+
+### Bug Fixes
+
+* continue with next order even if part of batch fails ([922828c](https://www.github.com/SimonRiis/annoedge_domain/commit/922828ce266f026a9493056c72379e103498e171))
+
 <a name="0.22.31"></a>
 ## [0.22.31](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.31) (2025-01-03)
 

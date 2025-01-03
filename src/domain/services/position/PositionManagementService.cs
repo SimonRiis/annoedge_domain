@@ -234,8 +234,8 @@ namespace domain.services.position
 
                         if (res.IsFail)
                         {
-                            return FinFail<Unit>($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
-                        }
+                            logger.LogError($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
+                        } // TODO: Should we continue with the next order or stop? For now we continue with the next order
                     }
 
                     return FinSucc(Unit.Default);
