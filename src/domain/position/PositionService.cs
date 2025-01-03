@@ -72,17 +72,6 @@ namespace domain.position
             );
         }
 
-        public async Task<Fin<IEnumerable<Fin<Position>>>> GetPositions(string query)
-        {
-            var positionsResult = await positionRepository.QueryAsync(query);
-
-            return await Task.WhenAll(positionsResult.Bind(positions =>
-            {
-                return positions.Select(ProcessPosition);
-            }
-            ));
-        }
-
         private async Task<Fin<Unit>> UpdateLegs(Position position)
         {
 
@@ -106,13 +95,6 @@ namespace domain.position
             }
             return FinSucc(Unit.Default);
 
-            //return Task.WhenAll(position.PositionOrderMaps.Select(positionOrderMapRepository.UpdateAsync)).ContinueWith(task =>
-            //{
-            //    if (task.Result.All(r => r.IsSucc))
-            //        return FinSucc(Unit.Default);
-            //    else
-            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            //});
         }
 
         public async Task<Fin<Unit>> UpdateAsync(Position position)
@@ -134,10 +116,6 @@ namespace domain.position
 
             return FinSucc(Unit.Default);
 
-            //var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
-            //var results = await Task.WhenAll(tasks);
-
-            //return results.FlattenResult();
         }
         public async Task<Fin<Unit>> AddAsync(Position position)
         {
@@ -185,38 +163,6 @@ namespace domain.position
                 return FinFail<Unit>($"Unexpected error: {ex.Message}");
             }
 
-
-            //await unitOfWork.Begin();
-            //var positionRes = positionRepository.AddAsync(position);
-            //var positionLegsRes = Task.WhenAll(position.Legs.Select(positionLegRepository.AddAsync)).ContinueWith(task =>
-            //{
-            //    if (task.Result.All(r => r.IsSucc))
-            //        return FinSucc(Unit.Default);
-            //    else
-            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            //});
-
-            //var positionOrderMapsRes = Task.WhenAll(position.PositionOrderMaps.Select(positionOrderMapRepository.AddAsync)).ContinueWith(task =>
-            //{
-            //    if (task.Result.All(r => r.IsSucc))
-            //        return FinSucc(Unit.Default);
-            //    else
-            //        return FinFail<Unit>(string.Join(", ", task.Result.Where(r => r.IsFail).Select(r => r.ToString())));
-            //});
-
-            //var tasks = new List<Task<Fin<Unit>>> { positionRes, positionLegsRes, positionOrderMapsRes };
-            //var results = await Task.WhenAll(tasks);
-
-            //if (results.All(result => result.IsSucc))
-            //{
-            //    await unitOfWork.Commit();
-            //    return FinSucc(Unit.Default);
-            //}
-            //else
-            //{
-            //    await unitOfWork.Rollback();
-            //    return results.FlattenResult();
-            //}
         }
 
         public async Task<Fin<Position>> GetPositionForOrderIdAsync(string orderId)
@@ -227,33 +173,6 @@ namespace domain.position
                 None: () => Task.FromResult(FinFail<Position>($"Could not find position for order: {orderId}"))
             );
         }
-
-        //public async Task<Fin<Unit>> MapOrderToPosition(Guid positionId, string orderId)
-        //{
-        //    if (positionId == Guid.Empty)
-        //        return FinFail<Unit>("Position Id cannot be empty");
-
-        //    if (string.IsNullOrEmpty(orderId))
-        //        return FinFail<Unit>("Order Id cannot be empty");
-
-        //    var position = await GetPositionAsync(positionId);
-
-        //    return await position.Match(
-        //        Succ: async p =>
-        //        {
-        //            var positionOrderMap = new PositionOrderMap { PositionId = positionId, OrderId = orderId };
-        //            var pRes = p.AddPositionOrderMap(positionOrderMap);
-
-        //            return await pRes.Match(
-
-        //                Succ: async _ => { return await UpdateAsync(p); },
-        //                Fail: error => Task.FromResult(FinFail<Unit>(error))
-
-        //                );
-        //        },
-        //        Fail: error => Task.FromResult(FinFail<Unit>("Could not find position"))
-        //    );
-        //}
 
         public async Task<Fin<Position>> GetPositionAsync(Guid positionId)
         {
@@ -273,8 +192,13 @@ namespace domain.position
                 var positions = await positionRepository.GetAllOpenForProductOnExchange(product, exchangeId);
                 return await positions.BindAsync(async p =>
                 {
-                    IEnumerable<Fin<Position>> positions = await Task.WhenAll(p.Select(ProcessPosition));
-                    return FinSucc(positions);
+                    List<Fin<Position>> positions = [];
+                    foreach (var position in p)
+                    {
+                        positions.Add(await ProcessPosition(position));
+                    }
+
+                    return FinSucc(positions.AsEnumerable());
                 });
             });
         }
@@ -284,8 +208,13 @@ namespace domain.position
             var positions = await positionRepository.GetAllOpen();
             return await positions.BindAsync(async p =>
             {
-                IEnumerable<Fin<Position>> positions = await Task.WhenAll(p.Select(ProcessPosition));
-                return FinSucc(positions);
+                List<Fin<Position>> positions = [];
+                foreach (var position in p)
+                {
+                    positions.Add(await ProcessPosition(position));
+                }
+
+                return FinSucc(positions.AsEnumerable());
             });
         }
     }
