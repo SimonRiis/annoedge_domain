@@ -36,7 +36,7 @@ namespace test
             var product = new Product
             {
                 Id = Guid.NewGuid(),
-                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, TradePrecision = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = 0 },
                 Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
             };
 
@@ -93,7 +93,7 @@ namespace test
             var product = new Product
             {
                 Id = Guid.NewGuid(),
-                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, TradePrecision = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = 0 },
                 Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
             };
 
@@ -164,7 +164,7 @@ namespace test
         var product = new Product
             {
                 Id = Guid.NewGuid(),
-                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, TradePrecision = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = 0 },
                 Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
             };
 
@@ -218,7 +218,7 @@ namespace test
         var product = new Product
             {
                 Id = Guid.NewGuid(),
-                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, MinOrderQtySize = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = None },
+                ProductInfo = new ProductInfo { AssetType = "", BaseCurrency = "", LastUpdated = DateTimeOffset.UtcNow, TradePrecision = 1, QuoteCurrency = "", SettlementCurrency = "", ExpirationDate = None, MarginRequirement = None, TickSize = 0  },
                 Symbol = new Symbol { Name = "BTCUSD", Id = symbolId },
             };
 
