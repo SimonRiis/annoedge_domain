@@ -1,4 +1,5 @@
-﻿using domain.order;
+﻿using domain.exchange;
+using domain.order;
 using domain.product;
 using domain.shared.repositories;
 using LanguageExt;
@@ -275,6 +276,16 @@ namespace domain.position
                     IEnumerable<Fin<Position>> positions = await Task.WhenAll(p.Select(ProcessPosition));
                     return FinSucc(positions);
                 });
+            });
+        }
+
+        public async Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositions()
+        {
+            var positions = await positionRepository.GetAllOpen();
+            return await positions.BindAsync(async p =>
+            {
+                IEnumerable<Fin<Position>> positions = await Task.WhenAll(p.Select(ProcessPosition));
+                return FinSucc(positions);
             });
         }
     }

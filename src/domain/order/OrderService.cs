@@ -91,6 +91,7 @@ namespace domain.order
                     return orderStatusRes;
                 }
 
+                //TODO ADD BOOK REF TO BOOKENTRY
                 var bookEntry = new BookEntry
                 {
                     Id = Guid.NewGuid(),
