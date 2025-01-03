@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.35"></a>
+## [0.22.35](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.35) (2025-01-03)
+
+### Bug Fixes
+
+* futureticker repo ([ec4dc86](https://www.github.com/SimonRiis/annoedge_domain/commit/ec4dc865f6a04f5d68a48f4bfc51ccf9c8a265b1))
+
 <a name="0.22.34"></a>
 ## [0.22.34](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.34) (2025-01-03)
 
