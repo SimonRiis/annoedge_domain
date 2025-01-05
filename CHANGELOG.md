@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.37"></a>
+## [0.22.37](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.37) (2025-01-05)
+
+### Bug Fixes
+
+* add position order map never try top update (if conflict db will ignore) ([3243759](https://www.github.com/SimonRiis/annoedge_domain/commit/3243759b1f55bfea9253783d2ad92bce16e56e43))
+
 <a name="0.22.36"></a>
 ## [0.22.36](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.36) (2025-01-04)
 
