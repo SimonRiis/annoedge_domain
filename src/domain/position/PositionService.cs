@@ -89,7 +89,7 @@ namespace domain.position
 
             foreach (var orderMap in position.PositionOrderMaps)
             {
-                var res = await positionOrderMapRepository.UpdateAsync(orderMap);
+                var res = await positionOrderMapRepository.AddAsync(orderMap);
                 if (res.IsFail)
                     return res;
             }
