@@ -52,7 +52,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         return FinSucc(unit);
     }
 
-    public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal takeprofitpct)
+    public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal pnlScaleTarget, decimal takeprofitpct)
     {
         if (stoplosspct >= 0)
             return Error.New("Stoploss must be a negative decimal less than 0");
@@ -60,10 +60,14 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         if (takeprofitpct <= 0)
             return Error.New("Take profit must be a non negative decimal bigger than 0");
 
+        if (pnlScaleTarget <= 0)
+            return Error.New("Pnl scale target must be a non negative decimal bigger than 0");
+
         PositionMandate = PositionMandate with
         {
             StoplossPct = stoplosspct,
-            TakeProfitPct = takeprofitpct
+            TakeProfitPct = takeprofitpct,
+            PnlScaleTarget = pnlScaleTarget
         };
 
         return FinSucc(unit);
