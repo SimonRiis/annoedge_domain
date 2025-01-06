@@ -13,6 +13,12 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     private readonly List<PositionLeg> _legs = [];
     public IReadOnlyCollection<PositionLeg> Legs => _legs.AsReadOnly();
 
+    private readonly List<PositionPnLEvent> _pnlEvents = [];
+    public IReadOnlyCollection<PositionPnLEvent> PnlEvents => _pnlEvents.AsReadOnly();
+
+    private readonly List<PositionEvent> _events = [];
+    public IReadOnlyCollection<PositionEvent> Events => _events.AsReadOnly();
+
     private readonly List<PositionOrderMap> _positionOrderMaps = [];
     public IReadOnlyCollection<PositionOrderMap> PositionOrderMaps => _positionOrderMaps.AsReadOnly();
 
@@ -41,6 +47,38 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     public override int GetHashCode()
     {
         return HashCode.Combine(Id);
+    }
+
+    public Fin<Unit> AddEvent(PositionEventType eventType, PositionStatus oldStatus, PositionStatus newStatus, string eventData)
+    {
+        var positionEvent = new PositionEvent
+        {
+            Id = Guid.NewGuid(),
+            PositionId = Id,
+            EventType = eventType,
+            OldStatus = oldStatus,
+            NewStatus = newStatus,
+            EventData = eventData,
+            CreatedAt = DateTimeOffset.UtcNow
+        };
+
+        _events.Add(positionEvent);
+        return FinSucc(unit);
+    }
+
+    public Fin<Unit> AddPnLEvent(decimal pnl, decimal pnlPct)
+    {
+        var pnlEvent = new PositionPnLEvent
+        {
+            Id = Guid.NewGuid(),
+            PositionId = Id,
+            Pnl = pnl,
+            PnlPct = pnlPct,
+            Timestamp = DateTimeOffset.UtcNow
+        };
+
+        _pnlEvents.Add(pnlEvent);
+        return FinSucc(unit);
     }
 
     public Fin<Unit> AddPositionOrderMap(PositionOrderMap positionOrderMap)
