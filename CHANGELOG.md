@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.39"></a>
+## [0.22.39](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.39) (2025-01-06)
+
+### Bug Fixes
+
+* added position event and pnl event ([988a8fc](https://www.github.com/SimonRiis/annoedge_domain/commit/988a8fc5cd133a33e3f04657cfe505f506e20091))
+
 <a name="0.22.38"></a>
 ## [0.22.38](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.38) (2025-01-06)
 
