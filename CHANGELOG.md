@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.38"></a>
+## [0.22.38](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.38) (2025-01-06)
+
+### Bug Fixes
+
+* update PnlScale Target on mandate ([5c3f346](https://www.github.com/SimonRiis/annoedge_domain/commit/5c3f346cd8d006731ee47cd1da0411496704ab13))
+
 <a name="0.22.37"></a>
 ## [0.22.37](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.37) (2025-01-05)
 
