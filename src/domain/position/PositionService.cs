@@ -11,7 +11,8 @@ using static LanguageExt.Prelude;
 namespace domain.position
 {
     public class PositionService(IUnitOfWork unitOfWork, IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
-        IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IProductRepository productRepository) : IPositionService
+        IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IPositionEventRepository positionEventRepository,
+        IPositionPnlEventRepository positionPnlEventRepository, IProductRepository productRepository) : IPositionService
     {
         public Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate)
         {
@@ -55,32 +56,72 @@ namespace domain.position
 
         }
 
-
         private async Task<Fin<Position>> ProcessPosition(Position position)
         {
             var positionLegs = await positionLegRepository.GetAllForPosition(position.Id);
-            return positionLegs.Match(
-                Succ: legs =>
+            return positionLegs.Bind(legs =>
+            {
+                foreach (var leg in legs)
                 {
-                    legs.Iter(leg =>
-                    {
-                        position.AddLeg(leg);
-                    });
-                    return FinSucc(position);
-                },
-                Fail: error => FinFail<Position>(error)
-            );
+                    var res = position.AddLeg(leg);
+                    if (res.IsFail)
+                        return FinFail<Position>($"Error adding leg to position: {position.Id}");
+                }
+
+                //var events = await positionEventRepository.GetAllForPosition(position.Id);
+
+                //return await events.BindAsync(async events =>
+                //{
+                //    foreach (var ev in events)
+                //    {
+                //        var res = position.AddEvent(ev.EventType, ev.OldStatus, ev.NewStatus, ev.EventData);
+                //        if (res.IsFail)
+                //            return FinFail<Position>($"Error adding event to position: {position.Id}");
+                //    }
+
+                //    var pnlEvents = await positionPnlEventRepository.GetAllForPosition(position.Id);
+
+                //    return pnlEvents.Bind(pnlEvents =>
+                //    {
+                //        foreach (var pnlEvent in pnlEvents)
+                //        {
+                //            var res = position.AddPnLEvent(pnlEvent.Pnl, pnlEvent.PnlPct);
+                //            if (res.IsFail)
+                //                return FinFail<Position>($"Error adding pnl event to position: {position.Id}");
+                //        }
+
+                //        return FinSucc(position);
+                //    });
+                //});
+
+                return FinSucc(position);
+            });
         }
 
         private async Task<Fin<Unit>> UpdateLegs(Position position)
         {
 
-            foreach(var leg in position.Legs)
+            foreach (var leg in position.Legs)
             {
                 var res = await positionLegRepository.UpdateAsync(leg);
                 if (res.IsFail)
                     return res;
             }
+
+            foreach (var ev in position.Events)
+            {
+                var res = await positionEventRepository.AddAsync(ev);
+                if (res.IsFail)
+                    return res;
+            }
+
+            foreach (var pnlEvent in position.PnlEvents)
+            {
+                var res = await positionPnlEventRepository.AddAsync(pnlEvent);
+                if (res.IsFail)
+                    return res;
+            }
+
             return FinSucc(Unit.Default);
         }
 
@@ -101,7 +142,7 @@ namespace domain.position
         {
             var positionRes = await positionRepository.UpdateAsync(position);
 
-            if(positionRes.IsFail)
+            if (positionRes.IsFail)
                 return positionRes;
 
             var positionLegsRes = await UpdateLegs(position);
@@ -216,6 +257,16 @@ namespace domain.position
 
                 return FinSucc(positions.AsEnumerable());
             });
+        }
+
+        public Task<Fin<PositionPnLEvent>> GetLatestPnlEvent(Guid positionId)
+        {
+            return positionPnlEventRepository.GetLatestPnlEvent(positionId);
+        }
+
+        public Task<Fin<PositionEvent>> GetLatestEvent(Guid positionId)
+        {
+            return positionEventRepository.GetLatestEvent(positionId);
         }
     }
 }
