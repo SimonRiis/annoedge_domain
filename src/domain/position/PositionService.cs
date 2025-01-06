@@ -11,8 +11,8 @@ using static LanguageExt.Prelude;
 namespace domain.position
 {
     public class PositionService(IUnitOfWork unitOfWork, IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
-        IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IPositionEventRepository positionEventRepository,
-        IPositionPnlEventRepository positionPnlEventRepository, IProductRepository productRepository) : IPositionService
+        IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IPositionEventService positionEventService,
+        IPositionPnlEventService positionPnlEventService, IProductRepository productRepository) : IPositionService
     {
         public Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate)
         {
@@ -108,16 +108,26 @@ namespace domain.position
                     return res;
             }
 
+            return FinSucc(Unit.Default);
+        }
+
+        private async Task<Fin<Unit>> UpdateEvents(Position position)
+        {
             foreach (var ev in position.Events)
             {
-                var res = await positionEventRepository.AddAsync(ev);
+                var res = await positionEventService.SaveEvent(ev);
                 if (res.IsFail)
                     return res;
             }
 
+            return FinSucc(Unit.Default);
+        }
+
+        private async Task<Fin<Unit>> UpdatePnlEvents(Position position)
+        {
             foreach (var pnlEvent in position.PnlEvents)
             {
-                var res = await positionPnlEventRepository.AddAsync(pnlEvent);
+                var res = await positionPnlEventService.SavePnlEvent(pnlEvent);
                 if (res.IsFail)
                     return res;
             }
@@ -127,7 +137,6 @@ namespace domain.position
 
         private async Task<Fin<Unit>> UpdateOrderMaps(Position position)
         {
-
             foreach (var orderMap in position.PositionOrderMaps)
             {
                 var res = await positionOrderMapRepository.AddAsync(orderMap);
@@ -144,6 +153,15 @@ namespace domain.position
 
             if (positionRes.IsFail)
                 return positionRes;
+
+            var positionEventsRes = await UpdateEvents(position);
+            if (positionEventsRes.IsFail)
+                return positionEventsRes;
+
+            var positionPnlEventsRes = await UpdatePnlEvents(position);
+
+            if (positionPnlEventsRes.IsFail)
+                return positionPnlEventsRes;
 
             var positionLegsRes = await UpdateLegs(position);
 
@@ -259,14 +277,8 @@ namespace domain.position
             });
         }
 
-        public Task<Fin<PositionPnLEvent>> GetLatestPnlEvent(Guid positionId)
-        {
-            return positionPnlEventRepository.GetLatestPnlEvent(positionId);
-        }
+     
 
-        public Task<Fin<PositionEvent>> GetLatestEvent(Guid positionId)
-        {
-            return positionEventRepository.GetLatestEvent(positionId);
-        }
+       
     }
 }
