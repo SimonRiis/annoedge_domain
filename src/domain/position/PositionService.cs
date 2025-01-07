@@ -250,7 +250,11 @@ namespace domain.position
                     return positionRes;
                 }
 
-               
+                var positionEventsRes = await UpdateEvents(position);
+                if (positionEventsRes.IsFail)
+                    return positionEventsRes;
+
+
                 // Add position legs sequentially
                 foreach (var leg in position.Legs)
                 {
