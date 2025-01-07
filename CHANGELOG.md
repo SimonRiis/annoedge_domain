@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.42"></a>
+## [0.22.42](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.42) (2025-01-07)
+
+### Bug Fixes
+
+* add max and current allocated ([91eda61](https://www.github.com/SimonRiis/annoedge_domain/commit/91eda616237d349a15b4039d411dd600c86858e2))
+
 <a name="0.22.41"></a>
 ## [0.22.41](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.41) (2025-01-07)
 
