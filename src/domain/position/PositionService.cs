@@ -12,7 +12,7 @@ namespace domain.position
 {
     public class PositionService(IUnitOfWork unitOfWork, IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
         IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IPositionEventService positionEventService,
-        IPositionPnlEventService positionPnlEventService, IProductRepository productRepository) : IPositionService
+        IPositionPnlEventService positionPnlEventService, IProductRepository productRepository, IPositionLegIntentRepository positionLegIntentRepository) : IPositionService
     {
         public Fin<Position> CreatePosition(IEnumerable<Order> orders, PositionMandate positionMandate)
         {
@@ -65,14 +65,33 @@ namespace domain.position
         private async Task<Fin<Position>> ProcessPosition(Position position)
         {
             var positionLegs = await positionLegRepository.GetAllForPosition(position.Id);
-            return positionLegs.Bind(legs =>
+            return await positionLegs.BindAsync(async legs =>
             {
                 foreach (var leg in legs)
                 {
-                    var res = position.AddLeg(leg);
+                    var intents = await positionLegIntentRepository.GetAllForPositionLeg(leg.Id);
+
+                    var res = intents.Bind(intents =>
+                    {
+                        foreach (var intent in intents)
+                        {
+                            var res = leg.AddIntent(intent);
+                            if (res.IsFail)
+                                return FinFail<PositionLeg>($"Error adding intent to leg: {leg.Id}");
+                        }
+                        return FinSucc(leg);
+                    });
+
                     if (res.IsFail)
+                        return FinFail<Position>($"Error adding legintents to position leg: {leg.Id} for position: {position.Id}");
+
+                    var resLeg = position.AddLeg(leg);
+                    if (resLeg.IsFail)
                         return FinFail<Position>($"Error adding leg to position: {position.Id}");
+
                 }
+
+                
 
                 //var events = await positionEventRepository.GetAllForPosition(position.Id);
 
@@ -102,6 +121,36 @@ namespace domain.position
 
                 return FinSucc(position);
             });
+        }
+
+        private async Task<Fin<Unit>> UpdateLegIntents(Position position)
+        {
+            foreach (var leg in position.Legs)
+            {
+                foreach (var intent in leg.PositionLegIntents)
+                {
+                    var res = await positionLegIntentRepository.UpdateAsync(intent);
+                    if (res.IsFail)
+                        return res;
+                }
+            }
+
+            return FinSucc(Unit.Default);
+        }
+
+        private async Task<Fin<Unit>> AddLegIntents(Position position)
+        {
+            foreach (var leg in position.Legs)
+            {
+                foreach (var intent in leg.PositionLegIntents)
+                {
+                    var res = await positionLegIntentRepository.AddAsync(intent);
+                    if (res.IsFail)
+                        return res;
+                }
+            }
+
+            return FinSucc(Unit.Default);
         }
 
         private async Task<Fin<Unit>> UpdateLegs(Position position)
@@ -160,6 +209,11 @@ namespace domain.position
             if (positionRes.IsFail)
                 return positionRes;
 
+            var positionLegIntentsRes = await UpdateLegIntents(position);
+
+            if (positionLegIntentsRes.IsFail)
+                return positionLegIntentsRes;
+
             var positionEventsRes = await UpdateEvents(position);
             if (positionEventsRes.IsFail)
                 return positionEventsRes;
@@ -196,6 +250,7 @@ namespace domain.position
                     return positionRes;
                 }
 
+               
                 // Add position legs sequentially
                 foreach (var leg in position.Legs)
                 {
@@ -205,6 +260,13 @@ namespace domain.position
                         await unitOfWork.Rollback();
                         return legRes;
                     }
+                }
+
+                var positionLegIntentsRes = await AddLegIntents(position);
+                if (positionLegIntentsRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return positionLegIntentsRes;
                 }
 
                 // Add position order maps sequentially
