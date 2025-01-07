@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.47"></a>
+## [0.22.47](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.47) (2025-01-07)
+
+### Bug Fixes
+
+* save events on creation of position ([e0468f2](https://www.github.com/SimonRiis/annoedge_domain/commit/e0468f24c5c72e007a5d3439de02e8141a8efff0))
+
 <a name="0.22.46"></a>
 ## [0.22.46](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.46) (2025-01-07)
 
