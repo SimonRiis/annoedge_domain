@@ -4,7 +4,10 @@ namespace domain.position
 {
     public record PositionLegIntent
     {
+
         public required Guid Id { get; init; }
+        public required Guid LegId { get; init; }
+        public required Guid PositionId { get; init; }
         public required decimal Quantity { get; init; }
         public required decimal PriceTarget { get; init; }
         public required Direction Direction { get; init; }
