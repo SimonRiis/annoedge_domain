@@ -38,7 +38,7 @@ public record PositionLeg
 
                 newQuantity = newQuantity <= 0 ? 0 : newQuantity; // Ensure the new quantity is not negative
 
-                var newStatus = newQuantity == 0 ? Status.Filled : Status.PartiallyFilled; // If the new quantity is 0, the status should be Filled
+                var newStatus = newQuantity == 0 ? Status.FILLED : Status.PARTIALLYFILLED; // If the new quantity is 0, the status should be Filled
 
                 var newIntent = i with { Quantity = newQuantity, Status = newStatus };
 
@@ -52,7 +52,7 @@ public record PositionLeg
 
     public Fin<decimal> GetOpenUnfilledQuantity()
     {
-        var unfilledQuantity = _intents.Where(i => i.Status != Status.Filled && i.Status != Status.Canceled).Sum(i => i.Quantity);
+        var unfilledQuantity = _intents.Where(i => i.Status != Status.FILLED && i.Status != Status.CANCELED).Sum(i => i.Quantity);
         return FinSucc(unfilledQuantity);
     }
 }

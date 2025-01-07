@@ -32,7 +32,7 @@ public class PositionLegService(ILogger<PositionLegService> logger, IPriceServic
     public Fin<UpdateIntentsResult> UpdateIntents(PositionLeg leg, decimal filledQuantity)
     {
         var unfilledPositionIntents = leg.PositionLegIntents
-            .Where(i => i.Status != Status.Filled && i.Status != Status.Canceled)
+            .Where(i => i.Status != Status.FILLED && i.Status != Status.CANCELED)
             .ToList();
 
         return ProcessIntentsRecursively(leg, unfilledPositionIntents, filledQuantity);
