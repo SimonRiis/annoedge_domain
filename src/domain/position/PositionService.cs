@@ -28,7 +28,10 @@ namespace domain.position
             if (positionMandate.TakeProfitPct <= 0)
                 return Error.New("PositionMandate Take profit cannot be 0 or negative");
 
-            if (positionMandate.MaxPositionSize <= 0)
+            if (positionMandate.CurrentlyAllocated <= 0)
+                return Error.New("PositionMandate max position size cannot be 0 or negative");
+
+            if(positionMandate.MaxAllocated <= 0)
                 return Error.New("PositionMandate max position size cannot be 0 or negative");
 
             var positionId = Guid.NewGuid();
@@ -49,7 +52,10 @@ namespace domain.position
             if (positionMandate.TakeProfitPct <= 0)
                 return Error.New("PositionMandate Take profit cannot be 0 or negative");
 
-            if (positionMandate.MaxPositionSize <= 0)
+            if (positionMandate.CurrentlyAllocated <= 0)
+                return Error.New("PositionMandate max position size cannot be 0 or negative");
+
+            if (positionMandate.MaxAllocated <= 0)
                 return Error.New("PositionMandate max position size cannot be 0 or negative");
 
             return FinSucc(new Position(positionId, PositionStatus.PENDING, DateTimeOffset.UtcNow, positionMandate, positionLegService));
