@@ -157,6 +157,8 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     {
         var intent = new PositionLegIntent
         {
+            LegId = positionLeg.Id,
+            PositionId = Id,
             CreatedAt = DateTimeOffset.UtcNow,
             Direction = direction,
             Id = Guid.NewGuid(),
