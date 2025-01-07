@@ -9,5 +9,6 @@ namespace domain.ExchangeOrderRequest
     public class ExchangeOrderRequestResponse
     {
         public required string OrderId { get; set; }
+        public required string ExchangeRawResponse { get; set; }
     }
 }
