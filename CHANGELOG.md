@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.41"></a>
+## [0.22.41](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.41) (2025-01-07)
+
+### Bug Fixes
+
+* Added exchange raw response to  ExchangeOrderRequestResponse dto ([6d2af92](https://www.github.com/SimonRiis/annoedge_domain/commit/6d2af9201e50e80b18c2e2aa0fd9373be1549cf5))
+
 <a name="0.22.40"></a>
 ## [0.22.40](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.40) (2025-01-06)
 
