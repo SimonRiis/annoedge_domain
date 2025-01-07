@@ -2,9 +2,9 @@
 {
     public enum Status
     {
-        Pending,
-        PartiallyFilled,
-        Filled,
-        Canceled
+        PENDING,
+        PARTIALLYFILLED,
+        FILLED,
+        CANCELED
     }
 }

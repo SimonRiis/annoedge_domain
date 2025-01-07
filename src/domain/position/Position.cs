@@ -168,7 +168,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
             Id = Guid.NewGuid(),
             PriceTarget = priceTarget,
             Quantity = quantity,
-            Status = shared.enums.Status.Pending,
+            Status = shared.enums.Status.PENDING,
             UpdatedAt = DateTimeOffset.UtcNow
         };
 

@@ -81,15 +81,15 @@ public class Order(Product product, Exchange exchange, string id, string externa
 
         if (filledQuantity == 0)
         {
-            Status = Status.Pending;
+            Status = Status.PENDING;
         }
         else if (filledQuantity < Quantity)
         {
-            Status = Status.PartiallyFilled;
+            Status = Status.PARTIALLYFILLED;
         }
         else if (filledQuantity >= Quantity)
         {
-            Status = Status.Filled;
+            Status = Status.FILLED;
         }
     }
 }
