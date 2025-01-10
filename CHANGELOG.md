@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.48"></a>
+## [0.22.48](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.48) (2025-01-10)
+
+### Bug Fixes
+
+* Added some more logs + a way to "unwrap" error from aFin , not pretty but usable ([0f0f130](https://www.github.com/SimonRiis/annoedge_domain/commit/0f0f1304792837d5f451d9107bdef0c8a3b36154))
+
 <a name="0.22.47"></a>
 ## [0.22.47](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.47) (2025-01-07)
 
