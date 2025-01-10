@@ -109,14 +109,33 @@ namespace domain.services.position
                                         {
                                             return
                                             position.IncreaseLeg(leg.Id, fill.Quantity, fill.Price) //if long increase long if short increase short
-
+                                              .Bind<Fin<Unit>>(_ =>
+                                              {
+                                                  logger.LogInformation($"PositionId: {position.Id} increased leg: {leg.Id} with {fill.Quantity} qty from fill: {fill.Id}");
+                                                  return FinSucc(Unit.Default);
+                                              })
                                             .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
+                                            .Bind<Fin<Unit>>(_ =>
+                                            {
+                                                logger.LogInformation($"PositionId: {position.Id} updated fill: {fill.Id} status to {FillStatus.FullyApplied}");
+                                                return FinSucc(Unit.Default);
+                                            })
                                             .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
                                         else if (fill.Direction != leg.Direction && fill.Status != FillStatus.FullyApplied) //closing or decreasing position
                                         {
                                             return position.DecreaseLeg(leg.Id, fill.Quantity) //if the fill is in the opposite direction we need to decrease the leg to support closing long or short positions
-                                                .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
+                                             .Bind<Fin<Unit>>(_ =>
+                                             {
+                                                 logger.LogInformation($"PositionId: {position.Id} decreased leg: {leg.Id} with {fill.Quantity} qty from fill: {fill.Id}");
+                                                 return FinSucc(Unit.Default);
+                                             })
+                                            .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
+                                                .Bind<Fin<Unit>>(_ =>
+                                                {
+                                                    logger.LogInformation($"PositionId: {position.Id} updated fill: {fill.Id} status to {FillStatus.FullyApplied}");
+                                                    return FinSucc(Unit.Default);
+                                                })
                                                 .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
                                         else
@@ -141,7 +160,11 @@ namespace domain.services.position
                                         if (positionRes.IsFail)
                                         {
                                             await unitOfWork.Rollback();
-                                            return positionRes;
+                                            return positionRes.UnwrapError().ToFin().Bind(error =>
+                                            {
+                                                logger.LogError(error.Message);
+                                                return FinFail<Unit>(error);
+                                            });
                                         }
 
                                         var orderRes = await orderService.UpdateAsync(order);
@@ -149,7 +172,11 @@ namespace domain.services.position
                                         if (orderRes.IsFail)
                                         {
                                             await unitOfWork.Rollback();
-                                            return orderRes;
+                                            return orderRes.UnwrapError().ToFin().Bind(error =>
+                                            {
+                                                logger.LogError(error.Message);
+                                                return FinFail<Unit>(error);
+                                            });
                                         }
 
                                         var globalBookUpdateRes = await bookService.UpdateAsync(globalBook);
@@ -157,7 +184,11 @@ namespace domain.services.position
                                         if (globalBookUpdateRes.IsFail)
                                         {
                                             await unitOfWork.Rollback();
-                                            return globalBookUpdateRes;
+                                            return globalBookUpdateRes.UnwrapError().ToFin().Bind(error =>
+                                            {
+                                                logger.LogError(error.Message);
+                                                return FinFail<Unit>(error);
+                                            });
                                         }
 
                                         var legBookUpdateRes = await bookService.UpdateAsync(legBook);
@@ -165,7 +196,11 @@ namespace domain.services.position
                                         if (legBookUpdateRes.IsFail)
                                         {
                                             await unitOfWork.Rollback();
-                                            return legBookUpdateRes;
+                                            return legBookUpdateRes.UnwrapError().ToFin().Bind(error =>
+                                            {
+                                                logger.LogError(error.Message);
+                                                return FinFail<Unit>(error);
+                                            });
                                         }
 
                                         var exchangeBookUpdateRes = await bookService.UpdateAsync(exchangeBook);
@@ -173,7 +208,11 @@ namespace domain.services.position
                                         if (exchangeBookUpdateRes.IsFail)
                                         {
                                             await unitOfWork.Rollback();
-                                            return exchangeBookUpdateRes;
+                                            return exchangeBookUpdateRes.UnwrapError().ToFin().Bind(error =>
+                                            {
+                                                logger.LogError(error.Message);
+                                                return FinFail<Unit>(error);
+                                            });
                                         }
 
                                         await unitOfWork.Commit();
@@ -182,6 +221,7 @@ namespace domain.services.position
                                     catch (Exception ex)
                                     {
                                         await unitOfWork.Rollback();
+                                        logger.LogError(ex, "Failed to update position, order or books");
                                         return FinFail<Unit>(ex.Message);
                                     }
                                 },
@@ -198,7 +238,11 @@ namespace domain.services.position
             var position = await positionService.GetPositionForOrderIdAsync(order.ExternalId); //order and position is mapped using the orders external id (external id is the id from the exchange)
             return await position.Match(
                 Succ: async position => await ProcessPosition(position, order),
-                Fail: error => Task.FromResult(FinFail<Unit>(error))
+                Fail: error =>
+                {
+                    logger.LogError($"Failed to get position for order {order.Id}", error);
+                    return Task.FromResult(FinFail<Unit>(error));
+                }
             );
         }
 
@@ -226,7 +270,19 @@ namespace domain.services.position
                         {
                             var res = fills.Map(fill =>
                             {
-                                return order.AddFill(fill);
+                                var addedFill = order.AddFill(fill);
+                                return addedFill.Match(
+                                    Succ: _ =>
+                                    {
+                                        logger.LogInformation($"Added fill {fill.Id} to order {order.Id}");
+                                        return FinSucc(Unit.Default);
+                                    },
+                                    Fail: error =>
+                                    {
+                                        logger.LogError($"Failed to add fill {fill.Id} to order {order.Id}", error);
+                                        return FinFail<Unit>(error);
+                                    }
+                                );
                             });
 
                             if (res.ToArray().FlattenResult().IsFail)
@@ -237,10 +293,16 @@ namespace domain.services.position
                             return await ProcessOrder(order);
                         });
 
-                        if (res.IsFail)
-                        {
-                            logger.LogError($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
-                        } // TODO: Should we continue with the next order or stop? For now we continue with the next order
+                        res.Match(
+
+                            Succ: _ => logger.LogInformation($"Processed order {order.Id}"),
+                            Fail: error => logger.LogError($"Failed to process order {order.Id}", error)
+
+                            );
+                        //if (res.IsFail)
+                        //{
+                        //    logger.LogError($"Failed to process order {order.Id}"); //TODO should we continue with the next order or stop? 
+                        //} // TODO: Should we continue with the next order or stop? For now we continue with the next order
                     }
 
                     return FinSucc(Unit.Default);
