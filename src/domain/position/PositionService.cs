@@ -5,12 +5,13 @@ using domain.shared.repositories;
 using LanguageExt;
 using LanguageExt.ClassInstances;
 using LanguageExt.Common;
+using Microsoft.Extensions.Logging;
 using System.Runtime.InteropServices;
 using static LanguageExt.Prelude;
 
 namespace domain.position
 {
-    public class PositionService(IUnitOfWork unitOfWork, IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
+    public class PositionService(ILogger<PositionService> logger,  IUnitOfWork unitOfWork, IPositionLegService positionLegService, IPositionLegRepository positionLegRepository,
         IPositionRepository positionRepository, IPositionOrderMapRepository positionOrderMapRepository, IPositionEventService positionEventService,
         IPositionPnlEventService positionPnlEventService, IProductRepository productRepository, IPositionLegIntentRepository positionLegIntentRepository) : IPositionService
     {
@@ -64,13 +65,16 @@ namespace domain.position
 
         private async Task<Fin<Position>> ProcessPosition(Position position)
         {
+            logger.LogInformation($"Processing position: {position.Id}");
             var positionLegs = await positionLegRepository.GetAllForPosition(position.Id);
             return await positionLegs.BindAsync(async legs =>
             {
+                logger.LogInformation($"Processing legs for position: {position.Id}");
                 foreach (var leg in legs)
                 {
                     var intents = await positionLegIntentRepository.GetAllForPositionLeg(leg.Id);
 
+                    logger.LogInformation($"Processing intents for leg: {leg.Id} for position: {position.Id}");
                     var res = intents.Bind(intents =>
                     {
                         foreach (var intent in intents)
@@ -90,8 +94,9 @@ namespace domain.position
                         return FinFail<Position>($"Error adding leg to position: {position.Id}");
 
                 }
+                logger.LogInformation($"Processed position: {position.Id}");
 
-                
+
 
                 //var events = await positionEventRepository.GetAllForPosition(position.Id);
 
@@ -291,6 +296,7 @@ namespace domain.position
             catch (Exception ex)
             {
                 await unitOfWork.Rollback();
+                logger.LogError(ex, "Error adding position");
                 return FinFail<Unit>($"Unexpected error: {ex.Message}");
             }
 
@@ -301,7 +307,10 @@ namespace domain.position
             var positionRes = await positionRepository.GetForOrderId(orderId);
             return await positionRes.Match(
                 Some: async position => { return await ProcessPosition(position); },
-                None: () => Task.FromResult(FinFail<Position>($"Could not find position for order: {orderId}"))
+                None: () => { 
+                    logger.LogError($"Could not find position for order: {orderId}");
+                    return Task.FromResult(FinFail<Position>($"Could not find position for order: {orderId}")); 
+                }
             );
         }
 
@@ -310,7 +319,10 @@ namespace domain.position
             var positionRes = await positionRepository.GetByIdAsync(positionId);
             return await positionRes.Match(
                 Some: async position => { return await ProcessPosition(position); },
-                None: () => Task.FromResult(FinFail<Position>($"Could not find position for id: {positionId}"))
+                None: () => {
+                    logger.LogError($"Could not find position for id: {positionId}");
+                    return Task.FromResult(FinFail<Position>($"Could not find position for id: {positionId}")); 
+                }
             );
         }
 
