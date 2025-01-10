@@ -1,5 +1,7 @@
 ﻿using LanguageExt;
 using LanguageExt.Common;
+using LanguageExt.TypeClasses;
+using Microsoft.Extensions.Logging;
 using static LanguageExt.Prelude;
 
 namespace domain
@@ -12,6 +14,11 @@ namespace domain
                 Succ: t => f(t),
                 Fail: ex => Task.FromResult(FinFail<U>(ex))
             );
+
+        public static Option<Error> UnwrapError<T>(this Fin<T> fin) =>
+     fin.Match(
+        Succ: t => None,
+        Fail: ex => Some(ex));
 
         // MapAsync: Monadic map for asynchronous operations returning Task<U>
         public static async Task<Fin<U>> MapAsync<T, U>(this Fin<T> fin, Func<T, Task<U>> f) =>
