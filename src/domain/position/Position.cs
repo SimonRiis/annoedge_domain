@@ -29,6 +29,18 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
 
         return Id == other.Id;
     }
+
+    public Fin<Unit> ClosePosition()
+    {
+        if (Legs.Any(x => x.Quantity > 0))
+        {
+            return Error.New($"Position {Id} position could not be closed, still open quantity on legs");
+        }
+
+        Status = PositionStatus.CLOSED;
+        return FinSucc(unit);
+    }
+
     public Fin<Unit> UpdateStatusBasedOnIntents()
     {
         var hasUnmatchedIntents = Legs
@@ -84,7 +96,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     public Fin<Unit> AddPositionOrderMap(PositionOrderMap positionOrderMap)
     {
         if (_positionOrderMaps.Any(pom => pom.OrderId == positionOrderMap.OrderId))
-            return Error.New("PositionOrderMap already exists for this order");
+            return Error.New($"Position {Id} PositionOrderMap already exists for this order");
 
         _positionOrderMaps.Add(positionOrderMap);
         return FinSucc(unit);
@@ -93,16 +105,16 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal pnlScaleTarget, decimal takeprofitpct, decimal currentlyAllocated)
     {
         if (stoplosspct >= 0)
-            return Error.New("Stoploss must be a negative decimal less than 0");
+            return Error.New($"Position {Id} Stoploss must be a negative decimal less than 0");
 
         if (takeprofitpct <= 0)
-            return Error.New("Take profit must be a non negative decimal bigger than 0");
+            return Error.New($"Position {Id} Take profit must be a non negative decimal bigger than 0");
 
         if (pnlScaleTarget <= 0)
-            return Error.New("Pnl scale target must be a non negative decimal bigger than 0");
+            return Error.New($"Position {Id} Pnl scale target must be a non negative decimal bigger than 0");
 
         if (currentlyAllocated < 0)
-            return Error.New("Currently allocated must be a non negative decimal bigger than 0");
+            return Error.New($"Position {Id} Currently allocated must be a non negative decimal bigger than 0");
 
         PositionMandate = PositionMandate with
         {
@@ -120,9 +132,9 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     {
         var existingLeg = _legs.FirstOrDefault(l => l.Product.Id == leg.Product.Id && l.Exchange == leg.Exchange);
         if (existingLeg != null)
-            return Error.New($"Position leg already exists for {leg.Product.Symbol} and {leg.Exchange} please increase leg instead");
+            return Error.New($"Position {Id} leg already exists for {leg.Product.Symbol} and {leg.Exchange} please increase leg instead");
         if (!leg.PositionId.Equals(Id))
-            return Error.New($"Position leg belong to different position");
+            return Error.New($"Position {Id} leg belong to different position");
         _legs.Add(leg);
         return FinSucc(unit);
     }
@@ -131,7 +143,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     private Fin<Unit> UpdateLeg(PositionLeg oldLeg, PositionLeg updatedLeg)
     {
         if (oldLeg == null)
-            return Error.New("Leg not found");
+            return Error.New($"Position {Id} Leg not found");
 
         _legs[_legs.IndexOf(oldLeg)] = updatedLeg;
         return FinSucc(unit);
@@ -143,7 +155,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         return leg.Match(
             Some: l => positionLegService.IncreaseQuantity(l, additionalQuantity, newEntryPrice)
                 .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
-            None: () => Error.New($"Position leg {legId} not found.")
+            None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
 
@@ -153,7 +165,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         return leg.Match(
             Some: l => positionLegService.DecreaseQuantity(l, decreaseQuantity)
                 .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
-            None: () => Error.New($"Position leg {legId} not found.")
+            None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
 
@@ -184,10 +196,10 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
                     var updateResult = UpdateLeg(l, updatedLeg.UpdatedLeg);
                     return updateResult.Match(
                         Succ: _ => FinSucc(updatedLeg.RemainingQuantity), // Return leftover quantity
-                        Fail: e => Error.New($"Failed to update leg {l.Id}. Error: {e}")
+                        Fail: e => Error.New($"Position {Id} Failed to update leg {l.Id}. Error: {e}")
                     );
                 }),
-            None: () => Error.New($"Position leg {positionLeg.Id} not found.")
+            None: () => Error.New($"Position {Id} Position leg {positionLeg.Id} not found.")
         );
     }
 }
