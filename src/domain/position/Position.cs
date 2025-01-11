@@ -140,13 +140,24 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     }
     public Option<PositionLeg> GetLegById(Guid legId) => _legs.Find(l => l.Id == legId);
 
-    private Fin<Unit> UpdateLeg(PositionLeg oldLeg, PositionLeg updatedLeg)
+    private Fin<Unit> UpdateLeg(Guid legId, PositionLeg updatedLeg)
     {
-        if (oldLeg == null)
-            return Error.New($"Position {Id} Leg not found");
-
-        _legs[_legs.IndexOf(oldLeg)] = updatedLeg;
-        return FinSucc(unit);
+        var oldLeg = GetLegById(legId);
+       return oldLeg.Match(
+            Some: l =>
+            {
+                try
+                {
+                    _legs[_legs.IndexOf(l)] = updatedLeg;
+                    return FinSucc(unit);
+                }
+                catch (Exception e)
+                {
+                    return Error.New($"Position {Id} Failed to update leg {legId}. Error: {e}");
+                }
+            },
+            None: () => Error.New($"Position {Id} Leg not found")
+        );
     }
 
     public Fin<Unit> IncreaseLeg(Guid legId, decimal additionalQuantity, decimal newEntryPrice)

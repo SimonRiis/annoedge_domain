@@ -24,19 +24,16 @@ public class Book(IBookEntryService bookEntryService)
             });
     }
 
-    private Fin<Unit> UpdateBookEntry(BookEntry oldBookEntry, BookEntry updatedBookEntry)
+    private Fin<Unit> UpdateBookEntry(Guid oldBookËntryId, BookEntry updatedBookEntry)
     {
-        if (oldBookEntry == null)
-            return Error.New("BookEntry null");
-
-        var bookEntry = GetBookEntryById(oldBookEntry.Id);
+        var bookEntry = GetBookEntryById(oldBookËntryId);
         return bookEntry.Match(
            Some: b =>
            {
-               _entries[_entries.IndexOf(oldBookEntry)] = updatedBookEntry;
+               _entries[_entries.IndexOf(b)] = updatedBookEntry;
                return FinSucc(unit);
            },
-           None: () => Error.New($"BookEntry for id {oldBookEntry.Id} not found.")
+           None: () => Error.New($"BookEntry for id {oldBookËntryId} not found.")
        );
     }
     public Fin<Unit> IncreaseBookEntryQuantity(Guid bookEntryId, decimal additionalQuantity, decimal newEntryPrice)
@@ -44,7 +41,7 @@ public class Book(IBookEntryService bookEntryService)
         var bookEntry = GetBookEntryById(bookEntryId);
         return bookEntry.Match(
             Some: b => bookEntryService.IncreaseQuantity(b, additionalQuantity, newEntryPrice)
-                .Bind(updatedLeg => UpdateBookEntry(b, updatedLeg)),
+                .Bind(updatedLeg => UpdateBookEntry(b.Id, updatedLeg)),
             None: () => Error.New($"BookEntry for id {bookEntryId} not found.")
         );
     }
@@ -54,7 +51,7 @@ public class Book(IBookEntryService bookEntryService)
         var bookEntry = GetBookEntryById(bookEntryId);
         return bookEntry.Match(
             Some: b => bookEntryService.DecreaseQuantity(b, decreaseQuantity)
-                .Bind(updatedLeg => UpdateBookEntry(b, updatedLeg)),
+                .Bind(updatedLeg => UpdateBookEntry(b.Id, updatedLeg)),
             None: () => Error.New($"BookEntry for id {bookEntryId} not found.")
         );
     }
