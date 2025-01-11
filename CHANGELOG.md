@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.51"></a>
+## [0.22.51](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.51) (2025-01-11)
+
+### Bug Fixes
+
+* enable close position if legs are closed ([55ffa55](https://www.github.com/SimonRiis/annoedge_domain/commit/55ffa5590bcb7e3416350bce27edd509f76542a0))
+
 <a name="0.22.50"></a>
 ## [0.22.50](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.50) (2025-01-11)
 
