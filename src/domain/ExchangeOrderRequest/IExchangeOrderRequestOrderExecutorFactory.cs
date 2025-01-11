@@ -9,6 +9,6 @@ namespace domain.ExchangeOrderRequest
 {
     public interface IExchangeOrderRequestOrderExecutorFactory
     {
-        Fin<IExchangeOrderRequestOrderExecutor> Get(Guid exchangeId);
+        Fin<IExchangeOrderRequestOrderExecutor> Get(Guid exchangeId, ExchangeOrderRequestType requestType);
     }
 }
