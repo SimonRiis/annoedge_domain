@@ -165,7 +165,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         var leg = GetLegById(legId);
         return leg.Match(
             Some: l => positionLegService.IncreaseQuantity(l, additionalQuantity, newEntryPrice)
-                .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
+                .Bind(updatedLeg => UpdateLeg(l.Id, updatedLeg)),
             None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
@@ -175,7 +175,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         var leg = GetLegById(legId);
         return leg.Match(
             Some: l => positionLegService.DecreaseQuantity(l, decreaseQuantity)
-                .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
+                .Bind(updatedLeg => UpdateLeg(l.Id, updatedLeg)),
             None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
@@ -195,7 +195,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
             UpdatedAt = DateTimeOffset.UtcNow
         };
 
-        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg, leg));
+        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg.Id, leg));
     }
     public Fin<decimal> DecreasePositionLegIntent(PositionLeg positionLeg, decimal quantity)
     {
@@ -204,7 +204,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
             Some: l => positionLegService.UpdateIntents(l, quantity)
                 .Bind(updatedLeg =>
                 {
-                    var updateResult = UpdateLeg(l, updatedLeg.UpdatedLeg);
+                    var updateResult = UpdateLeg(l.Id, updatedLeg.UpdatedLeg);
                     return updateResult.Match(
                         Succ: _ => FinSucc(updatedLeg.RemainingQuantity), // Return leftover quantity
                         Fail: e => Error.New($"Position {Id} Failed to update leg {l.Id}. Error: {e}")
