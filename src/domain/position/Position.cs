@@ -140,13 +140,24 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
     }
     public Option<PositionLeg> GetLegById(Guid legId) => _legs.Find(l => l.Id == legId);
 
-    private Fin<Unit> UpdateLeg(PositionLeg oldLeg, PositionLeg updatedLeg)
+    private Fin<Unit> UpdateLeg(Guid legId, PositionLeg updatedLeg)
     {
-        if (oldLeg == null)
-            return Error.New($"Position {Id} Leg not found");
-
-        _legs[_legs.IndexOf(oldLeg)] = updatedLeg;
-        return FinSucc(unit);
+        var oldLeg = GetLegById(legId);
+       return oldLeg.Match(
+            Some: l =>
+            {
+                try
+                {
+                    _legs[_legs.IndexOf(l)] = updatedLeg;
+                    return FinSucc(unit);
+                }
+                catch (Exception e)
+                {
+                    return Error.New($"Position {Id} Failed to update leg {legId}. Error: {e}");
+                }
+            },
+            None: () => Error.New($"Position {Id} Leg not found")
+        );
     }
 
     public Fin<Unit> IncreaseLeg(Guid legId, decimal additionalQuantity, decimal newEntryPrice)
@@ -154,7 +165,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         var leg = GetLegById(legId);
         return leg.Match(
             Some: l => positionLegService.IncreaseQuantity(l, additionalQuantity, newEntryPrice)
-                .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
+                .Bind(updatedLeg => UpdateLeg(l.Id, updatedLeg)),
             None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
@@ -164,7 +175,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         var leg = GetLegById(legId);
         return leg.Match(
             Some: l => positionLegService.DecreaseQuantity(l, decreaseQuantity)
-                .Bind(updatedLeg => UpdateLeg(l, updatedLeg)),
+                .Bind(updatedLeg => UpdateLeg(l.Id, updatedLeg)),
             None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
@@ -184,7 +195,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
             UpdatedAt = DateTimeOffset.UtcNow
         };
 
-        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg, leg));
+        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg.Id, leg));
     }
     public Fin<decimal> DecreasePositionLegIntent(PositionLeg positionLeg, decimal quantity)
     {
@@ -193,7 +204,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
             Some: l => positionLegService.UpdateIntents(l, quantity)
                 .Bind(updatedLeg =>
                 {
-                    var updateResult = UpdateLeg(l, updatedLeg.UpdatedLeg);
+                    var updateResult = UpdateLeg(l.Id, updatedLeg.UpdatedLeg);
                     return updateResult.Match(
                         Succ: _ => FinSucc(updatedLeg.RemainingQuantity), // Return leftover quantity
                         Fail: e => Error.New($"Position {Id} Failed to update leg {l.Id}. Error: {e}")
