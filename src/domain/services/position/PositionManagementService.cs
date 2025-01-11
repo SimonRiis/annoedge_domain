@@ -91,7 +91,7 @@ namespace domain.services.position
                                         if (fill.Direction == leg.Direction)
                                         {
                                             //same direction as leg, meaning we are adding to the position update intents
-                                            var _ = position.DecreasePositionLegIntent(leg, fill.Quantity).Bind<Fin<Unit>>(qty =>
+                                            var _ = position.DecreasePositionLegIntent(leg.Id, fill.Quantity).Bind<Fin<Unit>>(qty =>
                                             {
                                                 if (qty < 0)
                                                 {
