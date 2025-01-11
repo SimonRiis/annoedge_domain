@@ -24,16 +24,16 @@ public class Book(IBookEntryService bookEntryService)
             });
     }
 
-    private Fin<Unit> UpdateBookEntry(Guid oldBookËntryId, BookEntry updatedBookEntry)
+    private Fin<Unit> UpdateBookEntry(Guid oldBookEntryId, BookEntry updatedBookEntry)
     {
-        var bookEntry = GetBookEntryById(oldBookËntryId);
+        var bookEntry = GetBookEntryById(oldBookEntryId);
         return bookEntry.Match(
            Some: b =>
            {
                _entries[_entries.IndexOf(b)] = updatedBookEntry;
                return FinSucc(unit);
            },
-           None: () => Error.New($"BookEntry for id {oldBookËntryId} not found.")
+           None: () => Error.New($"BookEntry for id {oldBookEntryId} not found.")
        );
     }
     public Fin<Unit> IncreaseBookEntryQuantity(Guid bookEntryId, decimal additionalQuantity, decimal newEntryPrice)
