@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.50"></a>
+## [0.22.50](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.50) (2025-01-11)
+
+### Bug Fixes
+
+* added ExchangeOrderRequestType ([eb5fe92](https://www.github.com/SimonRiis/annoedge_domain/commit/eb5fe9218d6a3ea46b232918f2612f8842a1dc0b))
+
 <a name="0.22.49"></a>
 ## [0.22.49](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.49) (2025-01-10)
 
