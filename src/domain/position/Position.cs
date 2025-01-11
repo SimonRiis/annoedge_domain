@@ -180,26 +180,31 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         );
     }
 
-    public Fin<Unit> AddPositionLegIntent(PositionLeg positionLeg, Direction direction, decimal quantity, decimal priceTarget)
+    public Fin<Unit> AddPositionLegIntent(Guid legId, Direction direction, decimal quantity, decimal priceTarget)
     {
-        var intent = new PositionLegIntent
-        {
-            LegId = positionLeg.Id,
-            PositionId = Id,
-            CreatedAt = DateTimeOffset.UtcNow,
-            Direction = direction,
-            Id = Guid.NewGuid(),
-            PriceTarget = priceTarget,
-            Quantity = quantity,
-            Status = shared.enums.Status.PENDING,
-            UpdatedAt = DateTimeOffset.UtcNow
-        };
+        var positionLeg = GetLegById(legId);
+        return positionLeg.Match(
+            Some: l => {
+                var intent = new PositionLegIntent
+                {
+                    LegId = legId,
+                    PositionId = Id,
+                    CreatedAt = DateTimeOffset.UtcNow,
+                    Direction = direction,
+                    Id = Guid.NewGuid(),
+                    PriceTarget = priceTarget,
+                    Quantity = quantity,
+                    Status = shared.enums.Status.PENDING,
+                    UpdatedAt = DateTimeOffset.UtcNow
+                };
 
-        return positionLeg.AddIntent(intent).Bind(leg => UpdateLeg(positionLeg.Id, leg));
+                return l.AddIntent(intent).Bind(leg => UpdateLeg(legId, leg)); },
+            None: () => Error.New($"Position {Id} Position leg {legId} not found.")
+        );
     }
-    public Fin<decimal> DecreasePositionLegIntent(PositionLeg positionLeg, decimal quantity)
+    public Fin<decimal> DecreasePositionLegIntent(Guid legId, decimal quantity)
     {
-        var leg = GetLegById(positionLeg.Id);
+        var leg = GetLegById(legId);
         return leg.Match(
             Some: l => positionLegService.UpdateIntents(l, quantity)
                 .Bind(updatedLeg =>
@@ -210,7 +215,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
                         Fail: e => Error.New($"Position {Id} Failed to update leg {l.Id}. Error: {e}")
                     );
                 }),
-            None: () => Error.New($"Position {Id} Position leg {positionLeg.Id} not found.")
+            None: () => Error.New($"Position {Id} Position leg {legId} not found.")
         );
     }
 }
