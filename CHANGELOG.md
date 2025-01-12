@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.56"></a>
+## [0.22.56](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.56) (2025-01-12)
+
+### Bug Fixes
+
+* fix ([bde861c](https://www.github.com/SimonRiis/annoedge_domain/commit/bde861c684d1eb1309d22044c9b88b241c7af067))
+
 <a name="0.22.55"></a>
 ## [0.22.55](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.55) (2025-01-12)
 
