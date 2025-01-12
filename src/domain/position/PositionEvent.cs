@@ -12,6 +12,7 @@ namespace domain.position
         SCALE_IN,
         OPEN,
         SCALE_OUT,
+        CLOSING,
         CLOSE
     }
 
