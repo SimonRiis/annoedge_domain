@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.57"></a>
+## [0.22.57](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.57) (2025-01-12)
+
+### Bug Fixes
+
+* position cannot be open after entering CLOSING or CLOSED state ([5930054](https://www.github.com/SimonRiis/annoedge_domain/commit/59300543d4d6f1eb2672074f176ef819f217d7b1))
+
 <a name="0.22.56"></a>
 ## [0.22.56](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.56) (2025-01-12)
 
