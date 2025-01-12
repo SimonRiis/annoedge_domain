@@ -55,6 +55,82 @@ namespace domain.services.position
             }
         }
 
+        private async Task<Fin<Unit>> UpdateDatabase(Position position, Order order, Book globalBook, Book exchangeBook, Book legBook)
+        {
+            try
+            {
+                await unitOfWork.Begin();
+                var positionRes = await positionService.UpdateAsync(position);
+
+                if (positionRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return positionRes.UnwrapError().ToFin().Bind(error =>
+                    {
+                        logger.LogError(error.Message);
+                        return FinFail<Unit>(error);
+                    });
+                }
+
+                var orderRes = await orderService.UpdateAsync(order);
+
+                if (orderRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return orderRes.UnwrapError().ToFin().Bind(error =>
+                    {
+                        logger.LogError(error.Message);
+                        return FinFail<Unit>(error);
+                    });
+                }
+
+                var globalBookUpdateRes = await bookService.UpdateAsync(globalBook);
+
+                if (globalBookUpdateRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return globalBookUpdateRes.UnwrapError().ToFin().Bind(error =>
+                    {
+                        logger.LogError(error.Message);
+                        return FinFail<Unit>(error);
+                    });
+                }
+
+                var legBookUpdateRes = await bookService.UpdateAsync(legBook);
+
+                if (legBookUpdateRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return legBookUpdateRes.UnwrapError().ToFin().Bind(error =>
+                    {
+                        logger.LogError(error.Message);
+                        return FinFail<Unit>(error);
+                    });
+                }
+
+                var exchangeBookUpdateRes = await bookService.UpdateAsync(exchangeBook);
+
+                if (exchangeBookUpdateRes.IsFail)
+                {
+                    await unitOfWork.Rollback();
+                    return exchangeBookUpdateRes.UnwrapError().ToFin().Bind(error =>
+                    {
+                        logger.LogError(error.Message);
+                        return FinFail<Unit>(error);
+                    });
+                }
+
+                await unitOfWork.Commit();
+                return FinSucc(unit);
+            }
+            catch (Exception ex)
+            {
+                await unitOfWork.Rollback();
+                logger.LogError(ex, "Failed to update position, order or books");
+                return FinFail<Unit>(ex.Message);
+            }
+        }
+
 
         private async Task<Fin<Unit>> ProcessPosition(Position position, Order order)
         {
@@ -149,81 +225,8 @@ namespace domain.services.position
                                         return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
                                     }
 
-                                    //update position status
-                                    var _ = position.UpdateStatusBasedOnIntents();
+                                    return await position.UpdateStatusBasedOnIntents().BindAsync(_ => UpdateDatabase(position, order, globalBook, exchangeBook, legBook));
 
-                                    try
-                                    {
-                                        await unitOfWork.Begin();
-                                        var positionRes = await positionService.UpdateAsync(position);
-
-                                        if (positionRes.IsFail)
-                                        {
-                                            await unitOfWork.Rollback();
-                                            return positionRes.UnwrapError().ToFin().Bind(error =>
-                                            {
-                                                logger.LogError(error.Message);
-                                                return FinFail<Unit>(error);
-                                            });
-                                        }
-
-                                        var orderRes = await orderService.UpdateAsync(order);
-
-                                        if (orderRes.IsFail)
-                                        {
-                                            await unitOfWork.Rollback();
-                                            return orderRes.UnwrapError().ToFin().Bind(error =>
-                                            {
-                                                logger.LogError(error.Message);
-                                                return FinFail<Unit>(error);
-                                            });
-                                        }
-
-                                        var globalBookUpdateRes = await bookService.UpdateAsync(globalBook);
-
-                                        if (globalBookUpdateRes.IsFail)
-                                        {
-                                            await unitOfWork.Rollback();
-                                            return globalBookUpdateRes.UnwrapError().ToFin().Bind(error =>
-                                            {
-                                                logger.LogError(error.Message);
-                                                return FinFail<Unit>(error);
-                                            });
-                                        }
-
-                                        var legBookUpdateRes = await bookService.UpdateAsync(legBook);
-
-                                        if (legBookUpdateRes.IsFail)
-                                        {
-                                            await unitOfWork.Rollback();
-                                            return legBookUpdateRes.UnwrapError().ToFin().Bind(error =>
-                                            {
-                                                logger.LogError(error.Message);
-                                                return FinFail<Unit>(error);
-                                            });
-                                        }
-
-                                        var exchangeBookUpdateRes = await bookService.UpdateAsync(exchangeBook);
-
-                                        if (exchangeBookUpdateRes.IsFail)
-                                        {
-                                            await unitOfWork.Rollback();
-                                            return exchangeBookUpdateRes.UnwrapError().ToFin().Bind(error =>
-                                            {
-                                                logger.LogError(error.Message);
-                                                return FinFail<Unit>(error);
-                                            });
-                                        }
-
-                                        await unitOfWork.Commit();
-                                        return FinSucc(Unit.Default);
-                                    }
-                                    catch (Exception ex)
-                                    {
-                                        await unitOfWork.Rollback();
-                                        logger.LogError(ex, "Failed to update position, order or books");
-                                        return FinFail<Unit>(ex.Message);
-                                    }
                                 },
                                 None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
                                 );
