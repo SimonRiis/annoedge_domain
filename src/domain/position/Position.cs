@@ -30,7 +30,19 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         return Id == other.Id;
     }
 
-    public Fin<Unit> ClosePosition()
+    public Fin<Unit> SetPositionToClosing()
+    {
+        //TODO: should we check / validate something here?
+        //if (Legs.Any(x => x.Quantity > 0))
+        //{
+        //    return Error.New($"Position {Id} position could not be closed, still open quantity on legs");
+        //}
+
+        Status = PositionStatus.CLOSING;
+        return FinSucc(unit);
+    }
+
+    private Fin<Unit> ClosePosition()
     {
         if (Legs.Any(x => x.Quantity > 0))
         {
@@ -47,7 +59,20 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         .Select(leg => leg.GetOpenUnfilledQuantity())
         .Any(qty => qty.Match(Succ: q => q > 0, Fail: _ => false));
 
-        Status = hasUnmatchedIntents ? PositionStatus.PENDING : PositionStatus.OPEN;
+        if(hasUnmatchedIntents && Status != PositionStatus.CLOSING)
+        {
+            Status = PositionStatus.PENDING; // If there are unmatched intents, set the position to pending, however if the position is already closing, do not change the status
+            //that that the position can't be scaled no matter the status. 
+            //This is to prevent the position from being scaled while it is closing, ie waiting for intents to be matched
+        }
+        else if(!hasUnmatchedIntents && Status == PositionStatus.CLOSING)
+        {
+            return ClosePosition(); // Close the position if all intents are matched
+        }
+        else
+        {
+            Status = PositionStatus.OPEN; // If there are no unmatched intents, set the position to open
+        }
         return FinSucc(Unit.Default);
     }
 

@@ -4,5 +4,6 @@ public enum PositionStatus
 {
     PENDING,
     OPEN,
+    CLOSING,
     CLOSED
 }
