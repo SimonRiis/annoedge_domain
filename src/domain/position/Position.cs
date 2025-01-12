@@ -69,9 +69,9 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         {
             return ClosePosition(); // Close the position if all intents are matched
         }
-        else
+        else if(Status != PositionStatus.CLOSING && Status != PositionStatus.CLOSED)
         {
-            Status = PositionStatus.OPEN; // If there are no unmatched intents, set the position to open
+            Status = PositionStatus.OPEN; // If there are no unmatched intents, and we are no closing set the position to open
         }
         return FinSucc(Unit.Default);
     }
