@@ -224,8 +224,21 @@ namespace domain.services.position
                                     {
                                         return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
                                     }
-
-                                    return await position.UpdateStatusBasedOnIntents().BindAsync(_ => UpdateDatabase(position, order, globalBook, exchangeBook, legBook));
+                                    var oldPositionStatus = position.Status;
+                                    var positionEventType = position.Status switch
+                                    {
+                                        PositionStatus.PENDING => PositionEventType.OPEN,
+                                        PositionStatus.OPEN => PositionEventType.OPEN,
+                                        PositionStatus.CLOSING => PositionEventType.CLOSING,
+                                        PositionStatus.CLOSED => PositionEventType.CLOSE,
+                                        _ => PositionEventType.OPEN
+                                    };
+                                    return await position.UpdateStatusBasedOnIntents().Bind(_ => position.AddEvent(
+                                                    positionEventType,
+                                                    oldPositionStatus,
+                                                    position.Status,
+                                                    "UPDATED BY POSITION MANAGEMENT SERVICE"
+                                                )).BindAsync(_ => UpdateDatabase(position, order, globalBook, exchangeBook, legBook));
 
                                 },
                                 None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
