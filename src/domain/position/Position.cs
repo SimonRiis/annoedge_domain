@@ -129,8 +129,8 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
 
     public Fin<Unit> UpdateMandate(decimal stoplosspct, decimal pnlScaleTarget, decimal takeprofitpct, decimal currentlyAllocated)
     {
-        if (stoplosspct >= 0)
-            return Error.New($"Position {Id} Stoploss must be a negative decimal less than 0");
+        if (stoplosspct <= 0)
+            return Error.New($"Position {Id} Stoploss must be a non negative decimal bigger than 0");
 
         if (takeprofitpct <= 0)
             return Error.New($"Position {Id} Take profit must be a non negative decimal bigger than 0");
