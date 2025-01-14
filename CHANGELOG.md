@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.58"></a>
+## [0.22.58](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.58) (2025-01-14)
+
+### Bug Fixes
+
+* do not decrease legs (refer to https://github.com/users/SimonRiis/projects/8/views/1?pane=issue&itemId=93702073) ([2a0f438](https://www.github.com/SimonRiis/annoedge_domain/commit/2a0f438e0eecadb8501628c1780cb92c7a9b01b1))
+
 <a name="0.22.57"></a>
 ## [0.22.57](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.57) (2025-01-12)
 

@@ -198,22 +198,22 @@ namespace domain.services.position
                                             })
                                             .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
                                         }
-                                        else if (fill.Direction != leg.Direction && fill.Status != FillStatus.FullyApplied) //closing or decreasing position
-                                        {
-                                            return position.DecreaseLeg(leg.Id, fill.Quantity) //if the fill is in the opposite direction we need to decrease the leg to support closing long or short positions
-                                             .Bind<Fin<Unit>>(_ =>
-                                             {
-                                                 logger.LogInformation($"PositionId: {position.Id} decreased leg: {leg.Id} with {fill.Quantity} qty from fill: {fill.Id}");
-                                                 return FinSucc(Unit.Default);
-                                             })
-                                            .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
-                                                .Bind<Fin<Unit>>(_ =>
-                                                {
-                                                    logger.LogInformation($"PositionId: {position.Id} updated fill: {fill.Id} status to {FillStatus.FullyApplied}");
-                                                    return FinSucc(Unit.Default);
-                                                })
-                                                .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
-                                        }
+                                        //else if (fill.Direction != leg.Direction && fill.Status != FillStatus.FullyApplied) //closing or decreasing position
+                                        //{
+                                        //    return position.DecreaseLeg(leg.Id, fill.Quantity) //if the fill is in the opposite direction we need to decrease the leg to support closing long or short positions
+                                        //     .Bind<Fin<Unit>>(_ =>
+                                        //     {
+                                        //         logger.LogInformation($"PositionId: {position.Id} decreased leg: {leg.Id} with {fill.Quantity} qty from fill: {fill.Id}");
+                                        //         return FinSucc(Unit.Default);
+                                        //     })
+                                        //    .Bind<Fin<Unit>>(_ => order.UpdateFillStatus(fill.Id, FillStatus.FullyApplied))
+                                        //        .Bind<Fin<Unit>>(_ =>
+                                        //        {
+                                        //            logger.LogInformation($"PositionId: {position.Id} updated fill: {fill.Id} status to {FillStatus.FullyApplied}");
+                                        //            return FinSucc(Unit.Default);
+                                        //        })
+                                        //        .Bind<Fin<Unit>>(_ => ProcessBookAllocation(globalBook, exchangeBook, legBook, product, order.Direction, fill.Quantity, fill.Price));  //book.GetBookEntryByProductId(product.Id), $"Unknown direction for fill: {fill.Id}")
+                                        //}
                                         else
                                         {
                                             return FinFail<Unit>($"Unkown direction for fill: {fill.Id}"); // Return success for other cases if needed
@@ -224,8 +224,21 @@ namespace domain.services.position
                                     {
                                         return FinFail<Unit>(string.Join(", ", results.Fails().Select(r => r.Message)));
                                     }
-
-                                    return await position.UpdateStatusBasedOnIntents().BindAsync(_ => UpdateDatabase(position, order, globalBook, exchangeBook, legBook));
+                                    var oldPositionStatus = position.Status;
+                                    var positionEventType = position.Status switch
+                                    {
+                                        PositionStatus.PENDING => PositionEventType.OPEN,
+                                        PositionStatus.OPEN => PositionEventType.OPEN,
+                                        PositionStatus.CLOSING => PositionEventType.CLOSING,
+                                        PositionStatus.CLOSED => PositionEventType.CLOSE,
+                                        _ => PositionEventType.OPEN
+                                    };
+                                    return await position.UpdateStatusBasedOnIntents().Bind(_ => position.AddEvent(
+                                                    positionEventType,
+                                                    oldPositionStatus,
+                                                    position.Status,
+                                                    "UPDATED BY POSITION MANAGEMENT SERVICE"
+                                                )).BindAsync(_ => UpdateDatabase(position, order, globalBook, exchangeBook, legBook));
 
                                 },
                                 None: () => Task.FromResult(FinFail<Unit>("Could not find book for leg"))
