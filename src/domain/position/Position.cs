@@ -67,7 +67,7 @@ public class Position(Guid id, PositionStatus status, DateTimeOffset lastUpdated
         }
         else if(!hasUnmatchedIntents && Status == PositionStatus.CLOSING)
         {
-            return ClosePosition(); // Close the position if all intents are matched
+            return FinSucc(Unit.Default); //TODO: https://github.com/users/SimonRiis/projects/8/views/1?pane=issue&itemId=93702073 //ClosePosition(); // Close the position if all intents are matched
         }
         else if(Status != PositionStatus.CLOSING && Status != PositionStatus.CLOSED)
         {
