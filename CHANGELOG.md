@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.60"></a>
+## [0.22.60](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.60) (2025-01-14)
+
+### Bug Fixes
+
+* disable set status to CLOSED for now ([7aaf74c](https://www.github.com/SimonRiis/annoedge_domain/commit/7aaf74c4c94a1d22750dff25b15730db74b9dc9d))
+
 <a name="0.22.59"></a>
 ## [0.22.59](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.59) (2025-01-14)
 
