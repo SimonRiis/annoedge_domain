@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.61"></a>
+## [0.22.61](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.61) (2025-01-15)
+
+### Bug Fixes
+
+* add REQUIRE_MANUAL_INTERVENTION position event status ([2557ec3](https://www.github.com/SimonRiis/annoedge_domain/commit/2557ec32602f198f6636b7c4325dcf783121a341))
+
 <a name="0.22.60"></a>
 ## [0.22.60](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.60) (2025-01-14)
 
