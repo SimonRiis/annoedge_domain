@@ -10,4 +10,5 @@ public interface IPositionRepository : IRepository<Position>
 
     Task<Fin<IEnumerable<Position>>> GetAllOpenForProductOnExchange(Product product, Guid exchangeId);
     Task<Fin<IEnumerable<Position>>> GetAllOpen();
+    Task<Fin<IEnumerable<Position>>> GetOldOpenPositions(DateTimeOffset date);
 }

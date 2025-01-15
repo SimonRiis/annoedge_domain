@@ -361,8 +361,19 @@ namespace domain.position
             });
         }
 
-     
+        public async Task<Fin<IEnumerable<Fin<Position>>>> GetOldOpenPositions(DateTimeOffset date)
+        {
+            var positions = await positionRepository.GetOldOpenPositions(date);
+            return await positions.BindAsync(async p =>
+            {
+                List<Fin<Position>> positions = [];
+                foreach (var position in p)
+                {
+                    positions.Add(await ProcessPosition(position));
+                }
 
-       
+                return FinSucc(positions.AsEnumerable());
+            });
+        }
     }
 }
