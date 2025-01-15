@@ -17,8 +17,7 @@ namespace domain.position
         Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositions();
         Task<Fin<IEnumerable<Fin<Position>>>> GetOpenPositionsForSymbolAndExchange(string symbol, Guid exchangeId);
 
-     
-      
+        Task<Fin<IEnumerable<Fin<Position>>>> GetOldOpenPositions(DateTimeOffset date);
 
     }
 }
