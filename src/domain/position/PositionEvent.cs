@@ -13,7 +13,8 @@ namespace domain.position
         OPEN,
         SCALE_OUT,
         CLOSING,
-        CLOSE
+        CLOSE,
+        REQUIRE_MANUAL_INTERVENTION,
     }
 
     public record PositionEvent
