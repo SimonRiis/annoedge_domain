@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.63"></a>
+## [0.22.63](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.63) (2025-01-19)
+
+### Bug Fixes
+
+* extend the quote repository to be used for analytics jobs ([9d2810d](https://www.github.com/SimonRiis/annoedge_domain/commit/9d2810db122af4cb1b9e8ad74dd1b397bc0a48f8))
+
 <a name="0.22.62"></a>
 ## [0.22.62](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.62) (2025-01-15)
 
