@@ -1,4 +1,5 @@
-﻿using LanguageExt;
+﻿using domain.shared.enums;
+using LanguageExt;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace domain.quote
 {
     public interface IExchangeQuoteRepositoryFactory
     {
-        Fin<IQuoteRepository> Get(Guid exchangeId);
+        Fin<IQuoteRepository> Get(Guid exchangeId, SourceDataType sourceDataType);
     }
 }
