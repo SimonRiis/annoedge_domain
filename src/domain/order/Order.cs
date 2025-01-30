@@ -34,7 +34,6 @@ public class Order(Product product, Exchange exchange, string id, string externa
             return Error.New($"Trade with tradeId: {trade.Id} does not belong to this order.");
 
         _trades.Add(trade);
-        UpdateOrderStatus();
         return FinSucc(unit);
     }
 
