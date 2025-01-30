@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.65"></a>
+## [0.22.65](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.65) (2025-01-30)
+
+### Bug Fixes
+
+* Added timeframe to factory ([f473248](https://www.github.com/SimonRiis/annoedge_domain/commit/f473248e8d2b4c1ffa453de21f31ed89d0bd754c))
+
 <a name="0.22.64"></a>
 ## [0.22.64](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.64) (2025-01-19)
 

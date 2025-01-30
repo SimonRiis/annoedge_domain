@@ -10,6 +10,6 @@ namespace domain.quote
 {
     public interface IExchangeQuoteRepositoryFactory
     {
-        Fin<IQuoteRepository> Get(Guid exchangeId, SourceDataType sourceDataType);
+        Fin<IQuoteRepository> Get(Guid exchangeId, Guid timeframeId, SourceDataType sourceDataType);
     }
 }
