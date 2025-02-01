@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [versionize](https://github.com/versionize/versionize) for commit guidelines.
 
+<a name="0.22.66"></a>
+## [0.22.66](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.66) (2025-02-01)
+
+### Bug Fixes
+
+* get all quotes for all symbols for period ([bc3a7cc](https://www.github.com/SimonRiis/annoedge_domain/commit/bc3a7cce10cc6f35d347d246c4bd86e02af5d3a7))
+
 <a name="0.22.65"></a>
 ## [0.22.65](https://www.github.com/SimonRiis/annoedge_domain/releases/tag/v0.22.65) (2025-01-30)
 

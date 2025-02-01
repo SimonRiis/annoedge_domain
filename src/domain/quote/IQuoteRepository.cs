@@ -28,6 +28,7 @@ namespace domain.quote
         /// <param name="endDate"></param>
         /// <returns></returns>
         Task<Fin<IEnumerable<Quote>>> GetQuotesUnmappedAsync(string exchangesymbol, DateTimeOffset startDate, DateTimeOffset endDate);
+        Task<Fin<IEnumerable<Quote>>> GetQuotesUnmappedAsync(DateTimeOffset startDate, DateTimeOffset endDate);
         Task<Fin<IEnumerable<string>>> GetDistinctSymbolsAsync();
     }
 }
